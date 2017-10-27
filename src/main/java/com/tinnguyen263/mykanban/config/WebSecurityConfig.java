@@ -34,9 +34,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     ClientResources facebookClientResource;
 
-    @Qualifier("github")
+    @Qualifier("google")
     @Autowired
-    ClientResources githubClientResource;
+    ClientResources googleClientResource;
+
+//    @Qualifier("github")
+//    @Autowired
+//    ClientResources githubClientResource;
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
@@ -58,7 +62,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         CompositeFilter filter = new CompositeFilter();
         List<Filter> filters = new ArrayList<>();
         filters.add(ssoFilter(facebookClientResource, "/login/facebook"));
-        filters.add(ssoFilter(githubClientResource, "/login/github"));
+        filters.add(ssoFilter(googleClientResource, "/login/google"));
+//        filters.add(ssoFilter(githubClientResource, "/login/github"));
         filter.setFilters(filters);
         return filter;
     }

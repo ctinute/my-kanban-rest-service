@@ -29,15 +29,21 @@ public class Application {
         return registration;
     }
 
-    @Bean
-    @ConfigurationProperties("github")
-    public ClientResources github() {
-        return new ClientResources();
-    }
+//    @Bean
+//    @ConfigurationProperties("github")
+//    public ClientResources github() {
+//        return new ClientResources();
+//    }
 
     @Bean
     @ConfigurationProperties("facebook")
     public ClientResources facebook() {
+        return new ClientResources();
+    }
+
+    @Bean
+    @ConfigurationProperties("google")
+    public ClientResources google() {
         return new ClientResources();
     }
 }
