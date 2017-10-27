@@ -1,58 +1,64 @@
 package com.tinnguyen263.mykanban.controller;
 
-import java.util.List;
-
-import com.tinnguyen263.mykanban.controller.ResponseObject.Error;
-import com.tinnguyen263.mykanban.controller.ResponseObject.ResponseObject;
 import com.tinnguyen263.mykanban.model.User;
 import com.tinnguyen263.mykanban.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.bind.annotation.RestController;
+import javax.annotation.security.PermitAll;
+import java.util.List;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 public class UserController {
-	
-	@Autowired
-	private UserService userService;
-	
-	@RequestMapping(value = "/list", method = RequestMethod.GET, produces = {"application/json"})
-	public ResponseEntity<List<User>> userDetails() {
-		List<User> userDetails = userService.getAll();
-		return new ResponseEntity<List<User>>(userDetails, HttpStatus.OK);
-	}
 
-    @RequestMapping(value = "/add/{username}/{email}/{password}/{name}", method = RequestMethod.POST, produces = {"application/json"})
-    public ResponseObject addser(@PathVariable String username,
-                                 @PathVariable String email,
-                                 @PathVariable String password,
-                                 @PathVariable String name) {
-        // check if user (username or email) is already existed
-	    if (userService.getByKey(username) != null || userService.getByEmail(email) != null)
-            return new ResponseObject(
-                    false,
-                    new Error("","User existed !!!",""),
-                    null);
-        else {
-            User newUser = new User(username, email, password, name);
-            // check if user is successfully saved to database
-            if (userService.saveOrUpdate(newUser) != null)
-                return new ResponseObject(
-                        true,
-                        new Error("","Success !!!",""),
-                        null);
-            else
-                return new ResponseObject(
-                    false,
-                    new Error("","An error occurred !!!",""),
-                    null);
-        }
+    @Autowired
+    private UserService userService;
+
+    @PermitAll
+    @RequestMapping(value = "/all", method = RequestMethod.GET, produces = {"application/json"})
+    public List<User> getAllUser() {
+        return userService.getAll();
+    }
+
+    @RequestMapping(value = "/{uid}", method = RequestMethod.GET, consumes = {"application/json"}, produces = {"application/json"})
+    public ResponseEntity<String> getUser(
+            @PathVariable String uid,
+            @RequestBody User user
+    ) {
+        return null;
+    }
+
+    @PermitAll
+    @RequestMapping(value = "/registration/{username}/{password}", method = RequestMethod.POST, consumes = {"application/json"}, produces = {"application/json"})
+    public ResponseEntity<String> regUser(@PathVariable String username, @PathVariable String password) {
+        User newUser = new User(username, "some mail", password, "some name");
+        // check if user is successfully saved to database
+        if (userService.saveOrUpdate(newUser) != null)
+            return new ResponseEntity<String>("User has been successfully added", new HttpHeaders(), HttpStatus.OK);
+        else
+            return new ResponseEntity<String>("Error occurred when adding user", new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+
+
+    }
+
+    @RequestMapping(value = "/update/{uid}", method = RequestMethod.DELETE, consumes = {"application/json"}, produces = {"application/json"})
+    public ResponseEntity<String> updateUser(
+            @PathVariable String uid,
+            @RequestBody User user
+    ) {
+        return null;
+    }
+
+
+    @RequestMapping(value = "/update/{uid}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteUser(
+            @PathVariable String uid
+    ) {
+        return null;
     }
 
 }

@@ -1,32 +1,30 @@
 package com.tinnguyen263.mykanban.model;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.sql.Time;
 import java.util.Set;
 
 @Entity
 public class Card {
+
     private int id;
-    private String title;
+    private String name;
     private String content;
-    private Date dueDate;
-    private int displayOrder;
+    private Time dueTime;
 
-    private Ktable ktable;
-    private Stage stage;
-    private Set<Tag> tags;
+    private Mcolumn mcolumn;
+    private Set<Label> labels;
+    private Set<User> subscribedUser;
+    private Set<User> assignedUser;
+    private Set<Attachment> attachments;
+    private Set<Comment> comments;
+    private Set<Checklist> checklists;
 
-    public Card(){}
-
-    public Card(String title, String content, Date dueDate, int displayOrder) {
-        this.title = title;
-        this.content = content;
-        this.dueDate = dueDate;
-        this.displayOrder = displayOrder;
+    public Card() {
     }
 
     @Id
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     public int getId() {
         return id;
     }
@@ -36,17 +34,17 @@ public class Card {
     }
 
     @Basic
-    @Column(name = "title")
-    public String getTitle() {
-        return title;
+    @Column(name = "name", nullable = false, length = 128)
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Basic
-    @Column(name = "content")
+    @Column(name = "content", nullable = true, length = -1)
     public String getContent() {
         return content;
     }
@@ -56,58 +54,24 @@ public class Card {
     }
 
     @Basic
-    @Column(name = "due_date")
-    public Date getDueDate() {
-        return dueDate;
+    @Column(name = "due_time", nullable = true)
+    public Time getDueTime() {
+        return dueTime;
     }
 
-    public void setDueDate(Date dueDate) {
-        this.dueDate = dueDate;
+    public void setDueTime(Time dueTime) {
+        this.dueTime = dueTime;
     }
 
-    @Basic
-    @Column(name = "display_order")
-    public int getDisplayOrder() {
-        return displayOrder;
-    }
-
-    public void setDisplayOrder(int displayOrder) {
-        this.displayOrder = displayOrder;
-    }
 
     @ManyToOne()
-    @JoinColumn(name = "table_id", nullable = false)
-    public Ktable getKtable() {
-        return ktable;
+    @JoinColumn(name = "mcolumn_id")
+    public Mcolumn getMcolumn() {
+        return mcolumn;
     }
 
-    public void setKtable(Ktable ktable) {
-        this.ktable = ktable;
-    }
-
-    @ManyToOne()
-    @JoinColumn(name = "stage_id", nullable = false)
-    public Stage getStage() {
-        return stage;
-    }
-
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
-
-
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "card_tag",
-            joinColumns = @JoinColumn(name = "card_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id")
-    )
-    public Set<Tag> getTags() {
-        return tags;
-    }
-
-    public void setTags(Set<Tag> tags) {
-        this.tags = tags;
+    public void setMcolumn(Mcolumn mcolumn) {
+        this.mcolumn = mcolumn;
     }
 
     @Override
@@ -118,10 +82,9 @@ public class Card {
         Card card = (Card) o;
 
         if (id != card.id) return false;
-        if (displayOrder != card.displayOrder) return false;
-        if (title != null ? !title.equals(card.title) : card.title != null) return false;
+        if (name != null ? !name.equals(card.name) : card.name != null) return false;
         if (content != null ? !content.equals(card.content) : card.content != null) return false;
-        if (dueDate != null ? !dueDate.equals(card.dueDate) : card.dueDate != null) return false;
+        if (dueTime != null ? !dueTime.equals(card.dueTime) : card.dueTime != null) return false;
 
         return true;
     }
@@ -129,10 +92,9 @@ public class Card {
     @Override
     public int hashCode() {
         int result = id;
-        result = 31 * result + (title != null ? title.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (content != null ? content.hashCode() : 0);
-        result = 31 * result + (dueDate != null ? dueDate.hashCode() : 0);
-        result = 31 * result + displayOrder;
+        result = 31 * result + (dueTime != null ? dueTime.hashCode() : 0);
         return result;
     }
 }

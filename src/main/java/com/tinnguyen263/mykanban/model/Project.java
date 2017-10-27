@@ -1,9 +1,6 @@
 package com.tinnguyen263.mykanban.model;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Set;
 
 @Entity
@@ -11,16 +8,18 @@ public class Project {
     private int id;
     private String name;
     private String description;
-    private boolean isPublic;
+    private byte isPublic;
 
-    private Set<Stage> stages;
-    private Set<Card> cards;
-    private Set<Tag> tags;
+    private Team team;
 
-    public Project(){}
+    private Set<Mcolumn> mcolumns;
+    private Set<ProjectUser> projectUsers;
+
+    public Project() {
+    }
 
     @Id
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     public int getId() {
         return id;
     }
@@ -30,7 +29,7 @@ public class Project {
     }
 
     @Basic
-    @Column(name = "name")
+    @Column(name = "name", nullable = false, length = 128)
     public String getName() {
         return name;
     }
@@ -40,7 +39,7 @@ public class Project {
     }
 
     @Basic
-    @Column(name = "description")
+    @Column(name = "description", nullable = true, length = -1)
     public String getDescription() {
         return description;
     }
@@ -50,13 +49,33 @@ public class Project {
     }
 
     @Basic
-    @Column(name = "is_public")
-    public boolean getIsPublic() {
+    @Column(name = "is_public", nullable = false)
+    public byte getIsPublic() {
         return isPublic;
     }
 
-    public void setIsPublic(boolean isPublic) {
+    public void setIsPublic(byte isPublic) {
         this.isPublic = isPublic;
+    }
+
+    @ManyToOne()
+    @JoinColumn(name = "team_id")
+    public Team getTeam() {
+        return team;
+    }
+
+
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
+    @OneToMany(mappedBy = "project")
+    public Set<Mcolumn> getMcolumns() {
+        return mcolumns;
+    }
+
+    public void setMcolumns(Set<Mcolumn> mcolumns) {
+        this.mcolumns = mcolumns;
     }
 
     @Override
@@ -74,4 +93,12 @@ public class Project {
         return true;
     }
 
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (int) isPublic;
+        return result;
+    }
 }

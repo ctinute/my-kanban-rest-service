@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="mykanban@localhost" uuid="8b4a4076-cb68-40f1-bcb1-2b39dfcb6a93">
+    <data-source source="LOCAL" name="kanban@localhost" uuid="bae16c3c-eb70-4e3f-8a33-1b4ed78c8cc9">
       <driver-ref>mysql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://localhost:3306/mykanban</jdbc-url>
+      <jdbc-url>jdbc:mysql://localhost:3306/kanban</jdbc-url>
       <driver-properties>
         <property name="autoReconnect" value="true" />
         <property name="zeroDateTimeBehavior" value="convertToNull" />
