@@ -614,7 +614,7 @@ user_id</ColNames>
     </column>
     <column id="142" parent="20" name="password">
       <Position>5</Position>
-      <DataType>char(32)|0</DataType>
+      <DataType>char(60)|0</DataType>
       <NotNull>1</NotNull>
     </column>
     <index id="143" parent="20" name="email">

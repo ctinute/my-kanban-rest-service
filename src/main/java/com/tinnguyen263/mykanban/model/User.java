@@ -8,9 +8,8 @@ import java.util.Objects;
 public class User {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-
 
     @Column(nullable = false, length = 32)
     private String username;
@@ -27,11 +26,11 @@ public class User {
     public User() {
     }
 
-    public User(String username, String some_mail, String password, String some_name) {
+    public User(String username, String email, String name, String password) {
         this.username = username;
-        this.email = some_mail;
+        this.email = email;
+        this.name = name;
         this.password = password;
-        this.name = some_name;
     }
 
 

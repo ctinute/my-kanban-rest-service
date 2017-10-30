@@ -1,13 +1,16 @@
 package com.tinnguyen263.mykanban;
 
+import com.tinnguyen263.mykanban.config.CustomUserDetails;
+import com.tinnguyen263.mykanban.repository.UserRepository;
+import com.tinnguyen263.mykanban.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilter;
 
 @SpringBootApplication
 public class Application {
@@ -21,29 +24,15 @@ public class Application {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public FilterRegistrationBean oauth2ClientFilterRegistration(OAuth2ClientContextFilter filter) {
-        FilterRegistrationBean registration = new FilterRegistrationBean();
-        registration.setFilter(filter);
-        registration.setOrder(-100);
-        return registration;
+    @Autowired
+    public void authenticationManager(AuthenticationManagerBuilder builder, UserRepository repository, UserService service) throws Exception {
+        //Setup a default user if db is empty
+//        if (repository.count()==0)
+//            service.save(new User("user", "user", Arrays.asList(new Role("USER"), new Role("ACTUATOR"))));
+        builder.userDetailsService(userDetailsService(repository)).passwordEncoder(passwordEncoder());
     }
 
-//    @Bean
-//    @ConfigurationProperties("github")
-//    public ClientResources github() {
-//        return new ClientResources();
-//    }
-
-    @Bean
-    @ConfigurationProperties("facebook")
-    public ClientResources facebook() {
-        return new ClientResources();
-    }
-
-    @Bean
-    @ConfigurationProperties("google")
-    public ClientResources google() {
-        return new ClientResources();
+    private UserDetailsService userDetailsService(final UserRepository repository) {
+        return username -> new CustomUserDetails(repository.findByUsername(username));
     }
 }
