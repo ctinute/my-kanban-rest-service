@@ -4,7 +4,7 @@ REPLACE INTO oauth_client_details
  refresh_token_validity, additional_information, autoapprove)
 VALUES
   ('my-client-id', 'secret', 'read,write,trust',
-   'password,authorization_code,refresh_token', NULL, NULL, 36000, 36000, NULL, TRUE);
+   'password,authorization_code,refresh_token', NULL, NULL, 43200, 2592000, NULL, TRUE);
 
 # INSERT INTO oauth_client_details
 # (client_id, client_secret, scope, authorized_grant_types,

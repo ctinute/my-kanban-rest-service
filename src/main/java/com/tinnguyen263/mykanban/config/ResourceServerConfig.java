@@ -15,7 +15,9 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/register", "/login").permitAll()
                 .antMatchers("/logout").authenticated()
-                .antMatchers("/api/**").authenticated();
+                .antMatchers("/api/**").authenticated()
+                .and().csrf().disable();
     }
+
 }
 
