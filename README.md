@@ -23,4 +23,4 @@ REST API for my project managemment website
 
 ### APIs
 
-[Import Postman collection]('https://www.getpostman.com/collections/9c6a31ba3401bf50692c')
+Import Postman collection: https://www.getpostman.com/collections/9c6a31ba3401bf50692c
