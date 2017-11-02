@@ -27,12 +27,11 @@ public class OriginCorsFilter implements Filter {
         response.setHeader("Access-Control-Max-Age", "3600");
         response.setHeader("Access-Control-Allow-Headers", "x-requested-with, authorization, X-XSRF-TOKEN");
 
-//        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-//             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-//        } else {
-//            chain.doFilter(req, res);
-//        }
-        chain.doFilter(req, res);
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            chain.doFilter(req, res);
+        }
     }
 
     @Override

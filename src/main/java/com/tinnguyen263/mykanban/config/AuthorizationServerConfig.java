@@ -3,7 +3,6 @@ package com.tinnguyen263.mykanban.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -49,7 +48,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-        security.checkTokenAccess("permitAll()");
+        security.checkTokenAccess("isAuthenticated()");
         super.configure(security);
     }
 
@@ -62,7 +61,6 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 .tokenEnhancer(tokenEnhancerChain)
                 .authenticationManager(authenticationManager)
                 .exceptionTranslator(loggingExceptionTranslator)
-                .userDetailsService(userDetailsService)
-                .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST);
+                .userDetailsService(userDetailsService);
     }
 }
