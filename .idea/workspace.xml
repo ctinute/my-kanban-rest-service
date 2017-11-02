@@ -2,15 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list id="4ed1f4cf-4ad2-46f0-a187-1d6a689b0281" name="add Spring OAuth2 (experimental)" comment="" />
-    <list default="true" id="9abde967-434a-419f-8584-d2fcf69f6c1d" name="Default" comment="custom OAuth2 provider security change: InMemoryTokenStore -&gt; JdbcTokenStore">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/config/OriginCorsFilter.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/config/WebSecurityConfig.java" afterPath="" />
+    <list default="true" id="9abde967-434a-419f-8584-d2fcf69f6c1d" name="Default" comment="custom OAuth2 provider fix">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/Application.java" afterPath="$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/Application.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/config/AuthorizationServerConfig.java" afterPath="$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/config/AuthorizationServerConfig.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/config/ResourceServerConfig.java" afterPath="$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/config/ResourceServerConfig.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/controller/TokenController.java" afterPath="$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/controller/TokenController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/resources/application.yml" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -47,7 +42,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/config/AuthorizationServerConfig.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="447">
-              <caret line="64" column="56" lean-forward="false" selection-start-line="64" selection-start-column="56" selection-end-line="64" selection-end-column="56" />
+              <caret line="63" column="56" lean-forward="false" selection-start-line="63" selection-start-column="56" selection-end-line="63" selection-end-column="56" />
               <folding />
             </state>
           </provider>
@@ -56,8 +51,18 @@
       <file leaf-file-name="ResourceServerConfig.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/config/ResourceServerConfig.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
-              <caret line="29" column="58" lean-forward="false" selection-start-line="29" selection-start-column="58" selection-end-line="29" selection-end-column="58" />
+            <state relative-caret-position="136">
+              <caret line="11" column="13" lean-forward="true" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TokenController.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/controller/TokenController.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="350">
+              <caret line="46" column="99" lean-forward="true" selection-start-line="46" selection-start-column="99" selection-end-line="46" selection-end-column="99" />
               <folding />
             </state>
           </provider>
@@ -169,16 +174,16 @@
         <option value="$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/config/ServerSecurityConfig.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/config/CustomUserDetailService.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/config/SimpleCorsFilter.java" />
-        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/src/main/resources/schema.sql" />
         <option value="$PROJECT_DIR$/src/main/resources/data.sql" />
         <option value="$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/config/AuthorizationServerConfig.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/controller/TokenController.java" />
         <option value="$PROJECT_DIR$/src/main/resources/application.yml" />
         <option value="$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/config/WebSecurityConfig.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/config/ResourceServerConfig.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/config/OriginCorsFilter.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/Application.java" />
+        <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/config/ResourceServerConfig.java" />
       </list>
     </option>
   </component>
@@ -520,7 +525,7 @@
       <workItem from="1509357577072" duration="21399000" />
       <workItem from="1509415800110" duration="13545000" />
       <workItem from="1509525118040" duration="3618000" />
-      <workItem from="1509590038624" duration="18529000" />
+      <workItem from="1509590038624" duration="19916000" />
     </task>
     <task id="LOCAL-00001" summary="add Spring OAuth2 (experimental)">
       <created>1509137157516</created>
@@ -557,11 +562,18 @@
       <option name="project" value="LOCAL" />
       <updated>1509641921347</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="custom OAuth2 provider fix">
+      <created>1509646464798</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1509646464798</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="100552000" />
+    <option name="totallyTimeSpent" value="101939000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -586,7 +598,7 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.49769586" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.46850997" sideWeight="0.49546143" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Spring" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26935485" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.6374808" sideWeight="0.49697885" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31182796" sideWeight="0.49697885" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22995462" sideWeight="0.48" order="4" side_tool="false" content_ui="combo" />
       <window_info id="Bean Validation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -645,7 +657,8 @@
     <MESSAGE value="custom OAuth2 provider change: InMemoryTokenStore -&gt; JdbcTokenStore" />
     <MESSAGE value="add README.md" />
     <MESSAGE value="update schema" />
-    <option name="LAST_COMMIT_MESSAGE" value="update schema" />
+    <MESSAGE value="custom OAuth2 provider fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="custom OAuth2 provider fix" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
@@ -916,16 +929,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="306">
-            <caret line="18" column="4" lean-forward="false" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="4" />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Desktop/kanban-re-create.sql">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -974,14 +977,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/controller/TokenController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="248">
-          <caret line="46" column="99" lean-forward="true" selection-start-line="46" selection-start-column="99" selection-end-line="46" selection-end-column="99" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/Application.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="144">
@@ -996,7 +991,7 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/config/AuthorizationServerConfig.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="447">
-          <caret line="64" column="56" lean-forward="false" selection-start-line="64" selection-start-column="56" selection-end-line="64" selection-end-column="56" />
+          <caret line="63" column="56" lean-forward="false" selection-start-line="63" selection-start-column="56" selection-end-line="63" selection-end-column="56" />
           <folding />
         </state>
       </provider>
@@ -1019,10 +1014,29 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="213">
+            <caret line="21" column="28" lean-forward="false" selection-start-line="21" selection-start-column="28" selection-end-line="21" selection-end-column="28" />
+            <folding />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/controller/TokenController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="350">
+          <caret line="46" column="99" lean-forward="true" selection-start-line="46" selection-start-column="99" selection-end-line="46" selection-end-column="99" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/tinnguyen263/mykanban/config/ResourceServerConfig.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="29" column="58" lean-forward="false" selection-start-line="29" selection-start-column="58" selection-end-line="29" selection-end-column="58" />
+        <state relative-caret-position="136">
+          <caret line="11" column="13" lean-forward="true" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
           <folding />
         </state>
       </provider>

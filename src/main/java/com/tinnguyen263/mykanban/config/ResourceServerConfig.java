@@ -18,7 +18,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                 .antMatchers("/logout").authenticated()
                 .antMatchers("/api/**").authenticated()
                 .antMatchers("/tokens").authenticated()
-                .antMatchers("/tokens/**").authenticated()
+                .antMatchers("/tokens/**").permitAll()
                 .and().csrf().disable();
     }
 

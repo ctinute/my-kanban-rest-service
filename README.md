@@ -1,4 +1,4 @@
-#Project myKanban - RESTfull API
+# Project myKanban - RESTfull API
 
 REST API for my project managemment website 
 
@@ -10,10 +10,17 @@ REST API for my project managemment website
     - OAuth2
 - MySQL
 
+### Requirements
+
+- JDK 8
+- MySQL 5.6
+
 ### Usage
 
-null
+- clone project: `git clone https://github.com/tinnguyen263/ws_myKanban.git`
+- open project with IntelliJ IDEA
+- run SpringBoot Application
 
 ### APIs
 
-null
+[Import Postman collection]('https://www.getpostman.com/collections/9c6a31ba3401bf50692c')
