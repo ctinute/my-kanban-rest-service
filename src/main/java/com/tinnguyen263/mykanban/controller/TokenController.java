@@ -8,33 +8,33 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import javax.annotation.security.PermitAll;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 @Controller
+@RequestMapping("/api/tokens")
 public class TokenController {
 
     @Resource(name = "tokenServices")
+    private
     ConsumerTokenServices tokenServices;
 
     @Resource(name = "tokenStore")
+    private
     TokenStore tokenStore;
 
-    @RequestMapping(method = RequestMethod.POST, value = "/tokens/revoke/{tokenId}")
-    @ResponseBody
-    public void revokeToken(HttpServletRequest request, @PathVariable String tokenId) {
-        tokenServices.revokeToken(tokenId);
-    }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/tokens")
-    @ResponseBody
+    // this controller return all tokens
+    // TODO: delete on release
+    @PermitAll
+    @RequestMapping(method = RequestMethod.GET, value = "")
     public List<String> getTokens() {
-        List<String> tokenValues = new ArrayList<String>();
+        List<String> tokenValues = new ArrayList<>();
+        // TODO: modify when changing client id or adding support for multiple clients
         Collection<OAuth2AccessToken> tokens = tokenStore.findTokensByClientId("my-client-id");
         if (tokens != null) {
             for (OAuth2AccessToken token : tokens) {
@@ -44,8 +44,12 @@ public class TokenController {
         return tokenValues;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/tokens/revokeRefreshToken/{tokenId:.*}")
-    @ResponseBody
+    @RequestMapping(method = RequestMethod.POST, value = "/revoke/{tokenId}")
+    public void revokeToken(@PathVariable String tokenId) {
+        tokenServices.revokeToken(tokenId);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/revokeRefreshToken/{tokenId:.*}")
     public String revokeRefreshToken(@PathVariable String tokenId) {
         if (tokenStore instanceof JdbcTokenStore) {
             ((JdbcTokenStore) tokenStore).removeRefreshToken(tokenId);
