@@ -7,9 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.PermitAll;
 import java.security.Principal;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -26,92 +24,111 @@ public class UserController {
     * mapping '/api/users"
     * */
 
-    // this controller return all users
-    // TODO: delete on release
-    @PermitAll
+    // get current user's info
     @RequestMapping(value = "", method = RequestMethod.GET, produces = {"application/json"})
-    public List<User> getAllUsers() {
-        return userService.getAll();
+    public User getMyInfo(Principal principal) {
+        String username = ((CustomUserDetails) ((OAuth2Authentication) principal).getPrincipal()).getUsername();
+        return userService.findByUsername(username);
     }
 
-
-    // this controller is used for update current user's info
-    // for registering, check out RegisterController.java with "/register" mapping
+    // register a new user
     @RequestMapping(value = "", method = RequestMethod.POST, produces = {"application/json"})
-    public User updateMyInfo(@RequestParam(required = false) String newUsername,
-                             @RequestParam(required = false) String newEmail,
-                             @RequestParam(required = false) String newName,
+    public User register(@RequestParam String username,
+                         @RequestParam String email,
+                         @RequestParam String name,
+                         @RequestParam String password) {
+        // checking if username already existed
+        if (username != null && !username.isEmpty()) {
+            // TODO: validate username
+            if (userService.findByUsername(username) != null)
+                return null; // TODO: throw UserNameExisted exception
+        }
+        // checking if email already existed
+        if (email != null && !email.isEmpty()) {
+            // TODO: validate email
+            if (userService.findByEmail(email) != null)
+                return null; // TODO: throw EmailExisted exception
+        }
+
+        // save new user
+        return userService.saveOrUpdate(new User(username, email, name, password));
+    }
+
+    // update current user's info
+    @RequestMapping(value = "", method = RequestMethod.PUT, produces = {"application/json"})
+    public User updateMyInfo(@RequestParam(required = false) String username,
+                             @RequestParam(required = false) String email,
+                             @RequestParam(required = false) String name,
                              Principal principal) {
-        String username = ((CustomUserDetails) ((OAuth2Authentication) principal).getPrincipal()).getUsername();
-        User currentUser = userService.getByUsername(username);
+        String oldUsername = ((CustomUserDetails) ((OAuth2Authentication) principal).getPrincipal()).getUsername();
+        User currentUser = userService.findByUsername(oldUsername);
 
         // checking if new username already existed
-        if (newUsername != null && !newUsername.isEmpty())
-            if (userService.getByUsername(newUsername) == null)
-                currentUser.setUsername(newUsername);
-            else
+        if (username != null && !username.isEmpty()) {
+            // TODO: validate username
+            if (userService.findByUsername(username) != null)
                 return null; // TODO: throw UserNameExisted exception
-
-        // checking if email already existed
-        if (newEmail != null && !newEmail.isEmpty())
-            if (userService.getByEmail(newEmail) == null)
-                currentUser.setEmail(newEmail);
             else
+                currentUser.setUsername(username);
+        }
+        // checking if email already existed
+        if (email != null && !email.isEmpty()) {
+            // TODO: validate email
+            if (userService.findByEmail(email) != null)
                 return null; // TODO: throw EmailExisted exception
+            else
+                currentUser.setEmail(email);
+        }
 
-        if (newName != null && !newName.isEmpty())
-            currentUser.setName(newName);
+        if (name != null && !name.isEmpty())
+            currentUser.setName(name);
 
         return userService.saveOrUpdate(currentUser);
     }
 
-    /*
-    * mapping '/api/users/me"
-    * */
-    @RequestMapping(value = "/me", method = RequestMethod.GET, produces = {"application/json"})
-    public User getMyInfo(Principal principal) {
-        String username = ((CustomUserDetails) ((OAuth2Authentication) principal).getPrincipal()).getUsername();
-        return userService.getByUsername(username);
-    }
 
 
     /*
     * mapping '/api/users/{userId}"
     * */
+
+    // get specific user
     @RequestMapping(value = "/{userId}", method = RequestMethod.GET, produces = {"application/json"})
     public User getUser(@PathVariable Integer userId) {
-        return userService.getByKey(userId);
+        return userService.findByKey(userId);
     }
 
-    @RequestMapping(value = "/{userId}", method = RequestMethod.POST, produces = {"application/json"})
-    public User updateUser(@PathVariable Integer userId,
-                           @RequestParam(required = false) String newUsername,
-                           @RequestParam(required = false) String newEmail,
-                           @RequestParam(required = false) String newName) {
-        User user = userService.getByKey(userId);
-        // checking if new username already existed
-        if (newUsername != null && !newUsername.isEmpty())
-            if (userService.getByUsername(newUsername) == null)
-                user.setUsername(newUsername);
-            else
-                return null; // TODO: throw UserNameExisted exception
+    // update specific user ?
+//    @RequestMapping(value = "/{userId}", method = RequestMethod.PUT, produces = {"application/json"})
+//    public User updateUser(@PathVariable Integer userId,
+//                           @RequestParam(required = false) String newUsername,
+//                           @RequestParam(required = false) String newEmail,
+//                           @RequestParam(required = false) String newName) {
+//        User user = userService.findByKey(userId);
+//        // checking if new username already existed
+//        if (newUsername != null && !newUsername.isEmpty())
+//            if (userService.findByUsername(newUsername) == null)
+//                user.setUsername(newUsername);
+//            else
+//                return null; // TODO: throw UserNameExisted exception
+//
+//        // checking if email already existed
+//        if (newEmail != null && !newEmail.isEmpty())
+//            if (userService.findByEmail(newEmail) == null)
+//                user.setEmail(newEmail);
+//            else
+//                return null; // TODO: throw EmailExisted exception
+//
+//        if (newName != null && !newName.isEmpty())
+//            user.setName(newName);
+//
+//        return userService.saveOrUpdate(user);
+//    }
 
-        // checking if email already existed
-        if (newEmail != null && !newEmail.isEmpty())
-            if (userService.getByEmail(newEmail) == null)
-                user.setEmail(newEmail);
-            else
-                return null; // TODO: throw EmailExisted exception
-
-        if (newName != null && !newName.isEmpty())
-            user.setName(newName);
-
-        return userService.saveOrUpdate(user);
-    }
-
-    @RequestMapping(value = "/{uid}", method = RequestMethod.DELETE, produces = {"application/json"})
-    public void deleteUser(@PathVariable Integer userId) {
-        userService.deleteUser(userId);
-    }
+    // delete specific user ?
+//    @RequestMapping(value = "/{uid}", method = RequestMethod.DELETE, produces = {"application/json"})
+//    public void deleteUser(@PathVariable Integer userId) {
+//        userService.deleteByKey(userId);
+//    }
 
 }

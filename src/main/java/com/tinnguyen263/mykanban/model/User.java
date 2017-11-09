@@ -1,38 +1,39 @@
 package com.tinnguyen263.mykanban.model;
 
 import javax.persistence.*;
-import java.util.Objects;
+import java.util.Collection;
 
 @Entity
-@Table(name = "user")
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue
     private Integer id;
 
-    @Column(nullable = false, length = 32)
-    private String username;
-
-    @Column(nullable = false, length = 128)
+    @Column(name = "email", nullable = false, length = 128)
     private String email;
 
-    @Column(nullable = false, length = 128)
+    @Column(name = "name", nullable = false, length = 128)
     private String name;
 
-    @Column(nullable = false, length = 32)
+    @Column(name = "password", nullable = false, length = 60)
     private String password;
+
+    @Column(name = "username", nullable = false, length = 32)
+    private String username;
+
+    @OneToMany(mappedBy = "user")
+    private Collection<TeamUser> teamUsers;
 
     public User() {
     }
 
     public User(String username, String email, String name, String password) {
-        this.username = username;
         this.email = email;
         this.name = name;
         this.password = password;
+        this.username = username;
     }
-
 
     public Integer getId() {
         return id;
@@ -40,14 +41,6 @@ public class User {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getEmail() {
@@ -74,6 +67,22 @@ public class User {
         this.password = password;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public Collection<TeamUser> getTeamUsers() {
+        return teamUsers;
+    }
+
+    public void setTeamUsers(Collection<TeamUser> teamUsers) {
+        this.teamUsers = teamUsers;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -81,22 +90,22 @@ public class User {
 
         User user = (User) o;
 
-        if (!Objects.equals(id, user.id)) return false;
-        if (username != null ? !username.equals(user.username) : user.username != null) return false;
+        if (id != null ? !id.equals(user.id) : user.id != null) return false;
         if (email != null ? !email.equals(user.email) : user.email != null) return false;
         if (name != null ? !name.equals(user.name) : user.name != null) return false;
         if (password != null ? !password.equals(user.password) : user.password != null) return false;
+        if (username != null ? !username.equals(user.username) : user.username != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = id;
-        result = 31 * result + (username != null ? username.hashCode() : 0);
+        int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (email != null ? email.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (password != null ? password.hashCode() : 0);
+        result = 31 * result + (username != null ? username.hashCode() : 0);
         return result;
     }
 }

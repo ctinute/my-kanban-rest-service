@@ -15,10 +15,12 @@ REST API for my project managemment website
 - JDK 8
 - MySQL 5.6
 
-### Usage
+### How-to
 
 - clone project: `git clone https://github.com/tinnguyen263/ws_myKanban.git`
 - open project with IntelliJ IDEA
+- change database connection properties in `/src/main/resources/application.yml`
+- default client-id and client secret in `src/main/resources/schema.sql`
 - run SpringBoot Application
 
 ### APIs
