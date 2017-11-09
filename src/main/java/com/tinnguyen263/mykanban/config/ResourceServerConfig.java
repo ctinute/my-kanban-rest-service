@@ -1,6 +1,7 @@
 package com.tinnguyen263.mykanban.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
@@ -14,11 +15,9 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
         http.headers().frameOptions().disable()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/register", "/login").permitAll()
-                .antMatchers("/logout").authenticated()
-                .antMatchers("/api/**").authenticated()
-                .antMatchers("/tokens").authenticated()
-                .antMatchers("/tokens/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/users").permitAll()
+                .antMatchers("/api/tokens/**").permitAll()
+                .antMatchers("/**").authenticated()
                 .and().csrf().disable();
     }
 
