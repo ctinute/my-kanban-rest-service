@@ -34,7 +34,6 @@ public class TokenController {
     @RequestMapping(method = RequestMethod.GET, value = "")
     public List<String> getTokens() {
         List<String> tokenValues = new ArrayList<>();
-        // TODO: modify when changing client id or adding support for multiple clients
         Collection<OAuth2AccessToken> tokens = tokenStore.findTokensByClientId("my-client-id");
         if (tokens != null) {
             for (OAuth2AccessToken token : tokens) {

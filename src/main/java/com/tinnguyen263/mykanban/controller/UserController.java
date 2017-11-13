@@ -1,6 +1,8 @@
 package com.tinnguyen263.mykanban.controller;
 
 import com.tinnguyen263.mykanban.config.CustomUserDetails;
+import com.tinnguyen263.mykanban.exceptions.EmailExistedException;
+import com.tinnguyen263.mykanban.exceptions.UsernameExistedException;
 import com.tinnguyen263.mykanban.model.User;
 import com.tinnguyen263.mykanban.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,19 +38,16 @@ public class UserController {
     public User register(@RequestParam String username,
                          @RequestParam String email,
                          @RequestParam String name,
-                         @RequestParam String password) {
-        // checking if username already existed
-        if (username != null && !username.isEmpty()) {
-            // TODO: validate username
+                         @RequestParam String password) throws EmailExistedException, UsernameExistedException {
+        // checking if new username already existed
+        if (username != null && !username.isEmpty())
             if (userService.findByUsername(username) != null)
-                return null; // TODO: throw UserNameExisted exception
-        }
+                throw new UsernameExistedException();
+
         // checking if email already existed
-        if (email != null && !email.isEmpty()) {
-            // TODO: validate email
+        if (email != null && !email.isEmpty())
             if (userService.findByEmail(email) != null)
-                return null; // TODO: throw EmailExisted exception
-        }
+                throw new EmailExistedException();
 
         // save new user
         return userService.saveOrUpdate(new User(username, email, name, password));
@@ -59,26 +58,23 @@ public class UserController {
     public User updateMyInfo(@RequestParam(required = false) String username,
                              @RequestParam(required = false) String email,
                              @RequestParam(required = false) String name,
-                             Principal principal) {
+                             Principal principal) throws EmailExistedException, UsernameExistedException {
         String oldUsername = ((CustomUserDetails) ((OAuth2Authentication) principal).getPrincipal()).getUsername();
         User currentUser = userService.findByUsername(oldUsername);
 
         // checking if new username already existed
-        if (username != null && !username.isEmpty()) {
-            // TODO: validate username
+        if (username != null && !username.isEmpty())
             if (userService.findByUsername(username) != null)
-                return null; // TODO: throw UserNameExisted exception
+                throw new UsernameExistedException();
             else
                 currentUser.setUsername(username);
-        }
+
         // checking if email already existed
-        if (email != null && !email.isEmpty()) {
-            // TODO: validate email
+        if (email != null && !email.isEmpty())
             if (userService.findByEmail(email) != null)
-                return null; // TODO: throw EmailExisted exception
+                throw new EmailExistedException();
             else
                 currentUser.setEmail(email);
-        }
 
         if (name != null && !name.isEmpty())
             currentUser.setName(name);
@@ -98,37 +94,10 @@ public class UserController {
         return userService.findByKey(userId);
     }
 
-    // update specific user ?
-//    @RequestMapping(value = "/{userId}", method = RequestMethod.PUT, produces = {"application/json"})
-//    public User updateUser(@PathVariable Integer userId,
-//                           @RequestParam(required = false) String newUsername,
-//                           @RequestParam(required = false) String newEmail,
-//                           @RequestParam(required = false) String newName) {
-//        User user = userService.findByKey(userId);
-//        // checking if new username already existed
-//        if (newUsername != null && !newUsername.isEmpty())
-//            if (userService.findByUsername(newUsername) == null)
-//                user.setUsername(newUsername);
-//            else
-//                return null; // TODO: throw UserNameExisted exception
-//
-//        // checking if email already existed
-//        if (newEmail != null && !newEmail.isEmpty())
-//            if (userService.findByEmail(newEmail) == null)
-//                user.setEmail(newEmail);
-//            else
-//                return null; // TODO: throw EmailExisted exception
-//
-//        if (newName != null && !newName.isEmpty())
-//            user.setName(newName);
-//
-//        return userService.saveOrUpdate(user);
-//    }
-
     // delete specific user ?
-//    @RequestMapping(value = "/{uid}", method = RequestMethod.DELETE, produces = {"application/json"})
-//    public void deleteUser(@PathVariable Integer userId) {
-//        userService.deleteByKey(userId);
-//    }
+    @RequestMapping(value = "/{uid}", method = RequestMethod.DELETE, produces = {"application/json"})
+    public void deleteUser(@PathVariable Integer userId) {
+        userService.deleteByKey(userId);
+    }
 
 }

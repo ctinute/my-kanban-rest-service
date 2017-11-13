@@ -1,6 +1,9 @@
 package com.tinnguyen263.mykanban.controller;
 
 import com.tinnguyen263.mykanban.config.CustomUserDetails;
+import com.tinnguyen263.mykanban.exceptions.NotAdminException;
+import com.tinnguyen263.mykanban.exceptions.NotMemberException;
+import com.tinnguyen263.mykanban.exceptions.TeamNotFoundException;
 import com.tinnguyen263.mykanban.model.Team;
 import com.tinnguyen263.mykanban.model.TeamUser;
 import com.tinnguyen263.mykanban.model.User;
@@ -66,20 +69,23 @@ public class TeamController {
     // get specific team
     @RequestMapping(value = "/{teamId}", method = RequestMethod.GET, produces = {"application/json"})
     public Team getTeam(@PathVariable Integer teamId,
-                        Principal principal) {
+                        Principal principal) throws TeamNotFoundException, NotMemberException {
         Team team = teamService.findByKey(teamId);
+        if (team == null)
+            throw new TeamNotFoundException();
+        else {
+            // checking if team is public for anyone to view
+            if (team.getPublic())
+                return team;
 
-        // checking if team is public for anyone to view
-        if (team.getPublic())
-            return team;
-
-        // checking if current user is member of team (in case team is not public, only member can access team info)
-        String username = ((CustomUserDetails) ((OAuth2Authentication) principal).getPrincipal()).getUsername();
-        User currentUser = userService.findByUsername(username);
-        if (teamService.hasMember(team, currentUser))
-            return team;
-        else
-            return null; // TODO: throw exception
+            // checking if current user is member of team (in case team is not public, only member can access team info)
+            String username = ((CustomUserDetails) ((OAuth2Authentication) principal).getPrincipal()).getUsername();
+            User currentUser = userService.findByUsername(username);
+            if (teamService.hasMember(team, currentUser))
+                return team;
+            else
+                throw new NotMemberException();
+        }
     }
 
     // update specific team
@@ -88,7 +94,7 @@ public class TeamController {
                            @RequestParam(required = false) String name,
                            @RequestParam(required = false) String description,
                            @RequestParam(required = false) Boolean isPublic,
-                           Principal principal) {
+                           Principal principal) throws NotAdminException {
         String username = ((CustomUserDetails) ((OAuth2Authentication) principal).getPrincipal()).getUsername();
         User currentUser = userService.findByUsername(username);
         Team team = teamService.findByKey(teamId);
@@ -103,12 +109,12 @@ public class TeamController {
                 team.setPublic(isPublic);
             return teamService.saveOrUpdate(team);
         } else
-            return null; // TODO: throw exception
+            throw new NotAdminException();
     }
 
     // deleteByKey specific team
     @RequestMapping(value = "/{teamId}", method = RequestMethod.DELETE)
-    public void deleteTeam(@PathVariable Integer teamId, Principal principal) {
+    public void deleteTeam(@PathVariable Integer teamId, Principal principal) throws NotAdminException {
         String username = ((CustomUserDetails) ((OAuth2Authentication) principal).getPrincipal()).getUsername();
         User currentUser = userService.findByUsername(username);
         Team team = teamService.findByKey(teamId);
@@ -116,7 +122,7 @@ public class TeamController {
         // checking if current user is admin of this team (only admin can modify team)
         if (teamService.hasAdmin(team, currentUser)) {
             teamService.deleteByKey(teamId);
-        }
-        // TODO: throw exception in else clause
+        } else
+            throw new NotAdminException();
     }
 }
