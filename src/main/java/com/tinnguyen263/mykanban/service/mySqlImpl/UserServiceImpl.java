@@ -33,6 +33,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean checkExisted(Integer o) {
+        return userRepository.queryDistinctFirstById(o);
+    }
+
+    @Override
     public User saveOrUpdate(User o) {
         o.setPassword(passwordEncoder.encode(o.getPassword()));
         return userRepository.save(o);
@@ -56,6 +61,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByUsername(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public boolean checkEmailExisted(String email) {
+        return userRepository.queryDistinctFirstByEmail(email);
+    }
+
+    @Override
+    public boolean checkUsernameExisted(String username) {
+        return userRepository.queryDistinctFirstByUsername(username);
     }
 
 }

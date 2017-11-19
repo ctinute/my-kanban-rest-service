@@ -12,12 +12,12 @@ public class TeamUser {
     @Column(name = "is_admin", nullable = false)
     private Boolean isAdmin;
 
-    @MapsId("teamId")
+    @MapsId("teamUserPK.teamId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id", referencedColumnName = "id")
     private Team team;
 
-    @MapsId("userId")
+    @MapsId("teamUserPK.userId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;

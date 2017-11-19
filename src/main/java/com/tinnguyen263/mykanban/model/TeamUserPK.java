@@ -1,12 +1,16 @@
 package com.tinnguyen263.mykanban.model;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 
 @Embeddable
 public class TeamUserPK implements Serializable {
 
+    @Column(name = "team_id")
     private Integer teamId;
+
+    @Column(name = "user_id")
     private Integer userId;
 
     public TeamUserPK() {

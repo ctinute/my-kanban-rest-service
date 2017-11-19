@@ -15,9 +15,9 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
         http.headers().frameOptions().disable()
                 .and()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/api/users").permitAll()
                 .antMatchers("/api/tokens/**").permitAll()
-                .antMatchers("/**").authenticated()
+                .antMatchers(HttpMethod.POST, "/api/users").permitAll() // register endpoint
+                .antMatchers("/api/**").authenticated()
                 .and().csrf().disable();
     }
 
