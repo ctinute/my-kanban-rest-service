@@ -32,7 +32,7 @@ public class TeamUserServiceImpl implements TeamUserService {
 
     @Override
     public boolean checkExisted(TeamUserPK o) {
-        return teamUserRepository.queryDistinctFirstByTeamUserPK(o);
+        return findByKey(o) != null;
     }
 
     @Override
@@ -52,12 +52,15 @@ public class TeamUserServiceImpl implements TeamUserService {
 
     @Override
     public boolean checkIfUserIsAdmin(Integer teamId, Integer userId) {
-        return teamUserRepository.queryDistinctFirstByTeamUserPKAndIsAdmin(new TeamUserPK(teamId, userId), true);
+        TeamUser t = findByKey(new TeamUserPK(teamId, userId));
+        if (t != null)
+            return t.getAdmin();
+        return false;
     }
 
     @Override
     public boolean checkIfUserIsMember(Integer teamId, Integer userId) {
-        return teamUserRepository.queryDistinctFirstByTeamUserPK(new TeamUserPK(teamId, userId));
+        return checkExisted(new TeamUserPK(teamId, userId));
     }
 
 }

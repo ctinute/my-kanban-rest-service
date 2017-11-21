@@ -1,5 +1,7 @@
 package com.tinnguyen263.mykanban.controller;
 
+import com.tinnguyen263.mykanban.controller.dtos.TeamUserTeamDto;
+import com.tinnguyen263.mykanban.controller.dtos.UserDto;
 import com.tinnguyen263.mykanban.exceptions.EmailExistedException;
 import com.tinnguyen263.mykanban.exceptions.UsernameExistedException;
 import com.tinnguyen263.mykanban.model.Team;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Collection;
 
 @RestController
@@ -35,13 +38,13 @@ public class UserController {
 
     // get current user's info
     @RequestMapping(value = "", method = RequestMethod.GET, produces = {"application/json"})
-    public User getUser(Principal principal) {
-        return userService.findByUsername(Utils.getUsernameFromPrincipal(principal));
+    public UserDto getUser(Principal principal) {
+        return new UserDto(userService.findByUsername(Utils.getUsernameFromPrincipal(principal)));
     }
 
     // register a new user
     @RequestMapping(value = "", method = RequestMethod.POST, produces = {"application/json"})
-    public User register(@RequestBody User user) throws EmailExistedException, UsernameExistedException {
+    public UserDto register(@RequestBody UserDto user) throws EmailExistedException, UsernameExistedException {
         // checking if new username already existed
         if (user.getUsername() != null && !user.getUsername().isEmpty())
             if (userService.findByUsername(user.getUsername()) != null)
@@ -53,13 +56,13 @@ public class UserController {
                 throw new EmailExistedException();
 
         // save new user
-        return userService.saveOrUpdate(user);
+        return new UserDto(userService.saveOrUpdate(toEntity(user)));
     }
 
     // update current user's info
     @RequestMapping(value = "", method = RequestMethod.PUT, produces = {"application/json"})
-    public User updateUser(@RequestBody User user,
-                           Principal principal) throws UsernameExistedException, EmailExistedException {
+    public UserDto updateUser(@RequestBody UserDto user,
+                              Principal principal) throws UsernameExistedException, EmailExistedException {
         User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
 
         // checking if new username already existed
@@ -79,7 +82,7 @@ public class UserController {
         if (user.getName() != null && !user.getName().isEmpty())
             currentUser.setName(user.getName());
 
-        return userService.saveOrUpdate(currentUser);
+        return new UserDto(userService.saveOrUpdate(currentUser));
     }
 
     // delete current user
@@ -96,24 +99,41 @@ public class UserController {
 
     // get specific user
     @RequestMapping(value = "/{userId}", method = RequestMethod.GET, produces = {"application/json"})
-    public User getSpecificUser(@PathVariable Integer userId) {
-        return userService.findByKey(userId);
+    public UserDto getSpecificUser(@PathVariable Integer userId) {
+        return new UserDto(userService.findByKey(userId));
     }
 
     /*
     * mapping /api/users/{userId}/teams
     * */
     @RequestMapping(value = "/{userId}/teams", method = RequestMethod.GET)
-    public Collection<TeamUser> getTeamsOfSpecificUser(@PathVariable Integer userId, Principal principal) {
+    public Collection<TeamUserTeamDto> getTeamsOfSpecificUser(@PathVariable Integer userId,
+                                                              Principal principal) {
         User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
         User user = userService.findByKey(userId);
         Collection<TeamUser> teamUserList = user.getTeamUsers();
+        Collection<TeamUser> accessibleTeamUserList = new ArrayList<>();
         for (TeamUser t : teamUserList) {
             Team team = teamService.findByKey(t.getTeamUserPK().getTeamId());
-            if (!team.getPublic() && !teamUserService.checkIfUserIsMember(team.getId(), currentUser.getId()))
-                teamUserList.remove(t);
+            if (team.getPublic() || teamUserService.checkIfUserIsMember(team.getId(), currentUser.getId())) {
+                accessibleTeamUserList.add(t);
+            }
         }
-        return teamUserList;
+        Collection<TeamUserTeamDto> teamUserTeamDtos = new ArrayList<>();
+        for (TeamUser tu : accessibleTeamUserList)
+            teamUserTeamDtos.add(new TeamUserTeamDto(tu.getTeam(), tu.getAdmin()));
+        return teamUserTeamDtos;
+    }
+
+
+    private User toEntity(UserDto userDto) {
+        User user = new User();
+        user.setId(userDto.getId());
+        user.setUsername(userDto.getUsername());
+        user.setEmail(userDto.getEmail());
+        user.setName(userDto.getName());
+        user.setPassword(userDto.getPassword());
+        return user;
     }
 
 }

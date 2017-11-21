@@ -1,5 +1,8 @@
 package com.tinnguyen263.mykanban.controller;
 
+import com.tinnguyen263.mykanban.controller.dtos.TeamDto;
+import com.tinnguyen263.mykanban.controller.dtos.TeamUserTeamDto;
+import com.tinnguyen263.mykanban.controller.dtos.TeamUserUserDto;
 import com.tinnguyen263.mykanban.exceptions.NoModifyPermissionException;
 import com.tinnguyen263.mykanban.exceptions.NoViewPermissionException;
 import com.tinnguyen263.mykanban.model.Team;
@@ -13,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Collection;
 
 @RestController
@@ -37,24 +41,29 @@ public class TeamController {
 
     // get current user's teams
     @RequestMapping(value = "", method = RequestMethod.GET, produces = {"application/json"})
-    public Collection<TeamUser> getMyTeams(Principal principal) {
+    public Collection<TeamUserTeamDto> getMyTeams(Principal principal) {
         User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
-        return currentUser.getTeamUsers();
+        Collection<TeamUser> teamUsers = currentUser.getTeamUsers();
+        Collection<TeamUserTeamDto> teamUserTeamDtos = new ArrayList<>();
+        for (TeamUser tu : teamUsers)
+            teamUserTeamDtos.add(new TeamUserTeamDto(tu.getTeam(), tu.getAdmin()));
+        return teamUserTeamDtos;
     }
 
     // create new team
     @RequestMapping(value = "", method = RequestMethod.POST, produces = {"application/json"})
-    public Team addTeam(@RequestBody Team team,
-                        Principal principal) {
+    public TeamDto addTeam(@RequestBody TeamDto team,
+                           Principal principal) {
         // save team and get id back
-        Team newTeam = teamService.saveOrUpdate(team);
+        Team newTeam = teamService.saveOrUpdate(toEntity(team));
+
 
         // user who create team will be default team admin
         User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
         TeamUser t = new TeamUser(newTeam, currentUser, true);
         teamUserService.saveOrUpdate(t);
 
-        return newTeam;
+        return new TeamDto(newTeam);
     }
 
 
@@ -64,35 +73,34 @@ public class TeamController {
 
     // get specific team
     @RequestMapping(value = "/{teamId}", method = RequestMethod.GET, produces = {"application/json"})
-    public Team getTeam(@PathVariable Integer teamId,
-                        Principal principal) throws NoViewPermissionException {
+    public TeamDto getTeam(@PathVariable Integer teamId,
+                           Principal principal) throws NoViewPermissionException {
         User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
         Team team = teamService.findByKey(teamId);
 
-        if (team.getPublic() || teamUserService.checkIfUserIsMember(teamId, currentUser.getId()))
-            return team;
-        else
+        if (!team.getPublic() && !teamUserService.checkIfUserIsMember(teamId, currentUser.getId()))
             throw new NoViewPermissionException();
 
+        return new TeamDto(team);
     }
 
     // update specific team
     @RequestMapping(value = "/{teamId}", method = RequestMethod.PUT, produces = {"application/json"})
-    public Team updateTeam(@PathVariable Integer teamId,
-                           @RequestBody Team team,
-                           Principal principal) throws NoModifyPermissionException {
+    public TeamDto updateTeam(@PathVariable Integer teamId,
+                              @RequestBody TeamDto team,
+                              Principal principal) throws NoModifyPermissionException {
         User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
         Team oldTeam = teamService.findByKey(teamId);
 
-        if (teamUserService.checkIfUserIsAdmin(teamId, currentUser.getId())) {
-            if (team.getName() != null && !team.getName().isEmpty())
-                oldTeam.setName(team.getName());
-            if (team.getDescription() != null && !team.getDescription().isEmpty())
-                oldTeam.setDescription(team.getDescription());
-            oldTeam.setPublic(team.getPublic());
-            return teamService.saveOrUpdate(oldTeam);
-        } else
+        if (!teamUserService.checkIfUserIsAdmin(teamId, currentUser.getId()))
             throw new NoModifyPermissionException();
+
+        if (team.getName() != null && !team.getName().isEmpty())
+            oldTeam.setName(team.getName());
+        if (team.getDescription() != null && !team.getDescription().isEmpty())
+            oldTeam.setDescription(team.getDescription());
+        oldTeam.setPublic(team.getPublic());
+        return new TeamDto(teamService.saveOrUpdate(oldTeam));
     }
 
     // deleteByKey specific team
@@ -102,10 +110,10 @@ public class TeamController {
         Team team = teamService.findByKey(teamId);  // check if team existed, throws EntityNotFound
 
         // checking if current user is admin of this team (only admin can modify team)
-        if (teamUserService.checkIfUserIsAdmin(teamId, currentUser.getId())) {
-            teamService.deleteByKey(teamId);
-        } else
+        if (!teamUserService.checkIfUserIsAdmin(teamId, currentUser.getId()))
             throw new NoModifyPermissionException();
+
+        teamService.deleteByKey(teamId);
     }
 
 
@@ -115,20 +123,18 @@ public class TeamController {
 
     // get members of a specific team
     @RequestMapping(value = "/{teamId}/users", method = RequestMethod.GET)
-    public Collection<TeamUser> getMembers(@PathVariable Integer teamId, Principal principal) throws NoViewPermissionException {
+    public Collection<TeamUserUserDto> getMembers(@PathVariable Integer teamId, Principal principal) throws NoViewPermissionException {
+        User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
         Team team = teamService.findByKey(teamId);
 
-        // if team is public => everyone can view
-        if (team.getPublic())
-            return team.getTeamUsers();
+        if (!team.getPublic() && !teamUserService.checkIfUserIsMember(teamId, currentUser.getId()))
+            throw new NoViewPermissionException();
 
-        // else user must be member of team to view
-        User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
-        if (teamUserService.checkIfUserIsMember(teamId, currentUser.getId())) {
-            return team.getTeamUsers();
-        }
-
-        throw new NoViewPermissionException();
+        Collection<TeamUser> teamUsers = team.getTeamUsers();
+        Collection<TeamUserUserDto> teamUserUserDtos = new ArrayList<>();
+        for (TeamUser tu : teamUsers)
+            teamUserUserDtos.add(new TeamUserUserDto(tu.getUser(), tu.getAdmin()));
+        return teamUserUserDtos;
     }
 
     /*
@@ -149,6 +155,11 @@ public class TeamController {
         TeamUser t = teamUserService.findByKey(new TeamUserPK(teamId, userId));
         t.setAdmin(isAdmin);
         teamUserService.saveOrUpdate(t);
+    }
+
+
+    private Team toEntity(TeamDto teamDto) {
+        return new Team(teamDto.getName(), teamDto.getDescription(), teamDto.getPublic());
     }
 
 }

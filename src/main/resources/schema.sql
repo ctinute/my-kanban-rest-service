@@ -384,7 +384,7 @@ CREATE TABLE IF NOT EXISTS `kanban`.`oauth_refresh_token` (
 CREATE TABLE IF NOT EXISTS `kanban`.`project_member` (
   `project_id` INT(11)    NOT NULL,
   `user_id`    INT(11)    NOT NULL,
-  `isAdmin`    TINYINT(1) NOT NULL,
+  `is_admin`   TINYINT(1) NOT NULL,
   PRIMARY KEY (`project_id`, `user_id`),
   INDEX `project_member_user` (`user_id` ASC),
   CONSTRAINT `project_member_project`

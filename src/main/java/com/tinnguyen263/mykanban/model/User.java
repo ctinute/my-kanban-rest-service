@@ -25,6 +25,9 @@ public class User {
     @OneToMany(mappedBy = "user")
     private Collection<TeamUser> teamUsers;
 
+    @OneToMany(mappedBy = "user")
+    private Collection<ProjectMember> projectMembers;
+
     public User() {
     }
 
@@ -81,6 +84,14 @@ public class User {
 
     public void setTeamUsers(Collection<TeamUser> teamUsers) {
         this.teamUsers = teamUsers;
+    }
+
+    public Collection<ProjectMember> getProjectMembers() {
+        return projectMembers;
+    }
+
+    public void setProjectMembers(Collection<ProjectMember> projectMembers) {
+        this.projectMembers = projectMembers;
     }
 
     @Override

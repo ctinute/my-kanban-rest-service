@@ -12,8 +12,4 @@ public interface TeamUserRepository extends JpaRepository<TeamUser, TeamUserPK> 
     List<TeamUser> findAllByTeamUserPK_UserId(Integer userId);
     List<TeamUser> findAllByTeamUserPK_TeamId(Integer teamId);
     TeamUser findDistinctByTeamUserPK(TeamUserPK teamUserPK);
-
-    boolean queryDistinctFirstByTeamUserPK(TeamUserPK teamUserPK);
-
-    boolean queryDistinctFirstByTeamUserPKAndIsAdmin(TeamUserPK teamUserPK, boolean isAdmin);
 }

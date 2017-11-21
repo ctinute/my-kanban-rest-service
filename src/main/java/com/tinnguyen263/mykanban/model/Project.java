@@ -4,31 +4,32 @@ import javax.persistence.*;
 import java.util.Collection;
 
 @Entity
-public class Team {
+public class Project {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Integer id;
 
     @Column(name = "name", nullable = false, length = 128)
     private String name;
 
-    @Column(name = "description")
+    @Column(name = "description", nullable = true)
     private String description;
 
     @Column(name = "is_public", nullable = false)
     private Boolean isPublic;
 
-    @OneToMany(mappedBy = "team")
-    private Collection<TeamUser> teamUsers;
+    @ManyToOne()
+    @JoinColumn(name = "team_id", referencedColumnName = "id")
+    private Team team;
 
-    @OneToMany(mappedBy = "team")
-    private Collection<Project> projects;
+    @OneToMany(mappedBy = "project")
+    private Collection<ProjectMember> projectMembers;
 
-    public Team() {
+    public Project() {
     }
 
-    public Team(String name, String description, Boolean isPublic) {
+    public Project(String name, String description, Boolean isPublic) {
         this.name = name;
         this.description = description;
         this.isPublic = isPublic;
@@ -58,20 +59,28 @@ public class Team {
         this.description = description;
     }
 
-    public Boolean getPublic() {
+    public Boolean getIsPublic() {
         return isPublic;
     }
 
-    public void setPublic(Boolean aPublic) {
-        isPublic = aPublic;
+    public void setIsPublic(Boolean isPublic) {
+        this.isPublic = isPublic;
     }
 
-    public Collection<TeamUser> getTeamUsers() {
-        return teamUsers;
+    public Team getTeam() {
+        return team;
     }
 
-    public void setTeamUsers(Collection<TeamUser> teamUsers) {
-        this.teamUsers = teamUsers;
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
+    public Collection<ProjectMember> getProjectMembers() {
+        return projectMembers;
+    }
+
+    public void setProjectMembers(Collection<ProjectMember> projectMembers) {
+        this.projectMembers = projectMembers;
     }
 
     @Override
@@ -79,12 +88,14 @@ public class Team {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Team team = (Team) o;
+        Project project = (Project) o;
 
-        if (id != null ? !id.equals(team.id) : team.id != null) return false;
-        if (name != null ? !name.equals(team.name) : team.name != null) return false;
-        if (description != null ? !description.equals(team.description) : team.description != null) return false;
-        return isPublic != null ? isPublic.equals(team.isPublic) : team.isPublic == null;
+        if (id != null ? !id.equals(project.id) : project.id != null) return false;
+        if (name != null ? !name.equals(project.name) : project.name != null) return false;
+        if (description != null ? !description.equals(project.description) : project.description != null) return false;
+        if (isPublic != null ? !isPublic.equals(project.isPublic) : project.isPublic != null) return false;
+
+        return true;
     }
 
     @Override
@@ -95,4 +106,5 @@ public class Team {
         result = 31 * result + (isPublic != null ? isPublic.hashCode() : 0);
         return result;
     }
+
 }

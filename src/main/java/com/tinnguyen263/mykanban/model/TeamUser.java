@@ -48,8 +48,16 @@ public class TeamUser {
         isAdmin = admin;
     }
 
+    public Team getTeam() {
+        return team;
+    }
+
     public void setTeam(Team team) {
         this.team = team;
+    }
+
+    public User getUser() {
+        return user;
     }
 
     public void setUser(User user) {
