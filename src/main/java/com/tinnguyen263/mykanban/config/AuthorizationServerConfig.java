@@ -22,24 +22,27 @@ import java.util.Collections;
 @EnableAuthorizationServer
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    @Qualifier("dataSource")
-    @Autowired
-    DataSource dataSource;
+    private final DataSource dataSource;
 
-    @Autowired
-    TokenStore tokenStore;
+    private final TokenStore tokenStore;
 
-    @Autowired
-    TokenEnhancer tokenEnhancer;
+    private final TokenEnhancer tokenEnhancer;
 
-    @Autowired
-    UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
+
+    private final WebResponseExceptionTranslator loggingExceptionTranslator;
 
     @Autowired
-    WebResponseExceptionTranslator loggingExceptionTranslator;
+    public AuthorizationServerConfig(AuthenticationManager authenticationManager, @Qualifier("dataSource") DataSource dataSource, TokenStore tokenStore, TokenEnhancer tokenEnhancer, UserDetailsService userDetailsService, WebResponseExceptionTranslator loggingExceptionTranslator) {
+        this.authenticationManager = authenticationManager;
+        this.dataSource = dataSource;
+        this.tokenStore = tokenStore;
+        this.tokenEnhancer = tokenEnhancer;
+        this.userDetailsService = userDetailsService;
+        this.loggingExceptionTranslator = loggingExceptionTranslator;
+    }
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
@@ -48,7 +51,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-        security.checkTokenAccess("isAuthenticated()");
+        security.checkTokenAccess("permitAll()");
         super.configure(security);
     }
 
