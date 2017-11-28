@@ -207,17 +207,17 @@ CREATE TABLE IF NOT EXISTS `kanban`.`checklist_option` (
 -- Table `kanban`.`clientdetails`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `kanban`.`clientdetails` (
-  `appId`                  VARCHAR(256)  NOT NULL,
-  `resourceIds`            VARCHAR(256)  NULL DEFAULT NULL,
-  `appSecret`              VARCHAR(256)  NULL DEFAULT NULL,
-  `scope`                  VARCHAR(256)  NULL DEFAULT NULL,
-  `grantTypes`             VARCHAR(256)  NULL DEFAULT NULL,
-  `redirectUrl`            VARCHAR(256)  NULL DEFAULT NULL,
-  `authorities`            VARCHAR(256)  NULL DEFAULT NULL,
+  `appId`                  VARCHAR(255)  NOT NULL,
+  `resourceIds`            VARCHAR(255)  NULL DEFAULT NULL,
+  `appSecret`              VARCHAR(255)  NULL DEFAULT NULL,
+  `scope`                  VARCHAR(255)  NULL DEFAULT NULL,
+  `grantTypes`             VARCHAR(255)  NULL DEFAULT NULL,
+  `redirectUrl`            VARCHAR(255)  NULL DEFAULT NULL,
+  `authorities`            VARCHAR(255)  NULL DEFAULT NULL,
   `access_token_validity`  INT(11)       NULL DEFAULT NULL,
   `refresh_token_validity` INT(11)       NULL DEFAULT NULL,
-  `additionalInformation`  VARCHAR(4096) NULL DEFAULT NULL,
-  `autoApproveScopes`      VARCHAR(256)  NULL DEFAULT NULL,
+  `additionalInformation`  VARCHAR(4095) NULL DEFAULT NULL,
+  `autoApproveScopes`      VARCHAR(255)  NULL DEFAULT NULL,
   PRIMARY KEY (`appId`)
 )
   ENGINE = InnoDB
@@ -285,13 +285,13 @@ CREATE TABLE IF NOT EXISTS `kanban`.`label_card` (
 -- Table `kanban`.`oauth_access_token`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `kanban`.`oauth_access_token` (
-  `token_id`          VARCHAR(256) NULL DEFAULT NULL,
+  `token_id`          VARCHAR(255) NULL DEFAULT NULL,
   `token`             BLOB         NULL DEFAULT NULL,
-  `authentication_id` VARCHAR(256) NOT NULL,
-  `user_name`         VARCHAR(256) NULL DEFAULT NULL,
-  `client_id`         VARCHAR(256) NULL DEFAULT NULL,
+  `authentication_id` VARCHAR(255) NOT NULL,
+  `user_name`         VARCHAR(255) NULL DEFAULT NULL,
+  `client_id`         VARCHAR(255) NULL DEFAULT NULL,
   `authentication`    BLOB         NULL DEFAULT NULL,
-  `refresh_token`     VARCHAR(256) NULL DEFAULT NULL,
+  `refresh_token`     VARCHAR(255) NULL DEFAULT NULL,
   PRIMARY KEY (`authentication_id`)
 )
   ENGINE = InnoDB
@@ -303,9 +303,9 @@ CREATE TABLE IF NOT EXISTS `kanban`.`oauth_access_token` (
 -- Table `kanban`.`oauth_approvals`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `kanban`.`oauth_approvals` (
-  `userId`         VARCHAR(256) NULL     DEFAULT NULL,
-  `clientId`       VARCHAR(256) NULL     DEFAULT NULL,
-  `scope`          VARCHAR(256) NULL     DEFAULT NULL,
+  `userId`         VARCHAR(255) NULL     DEFAULT NULL,
+  `clientId`       VARCHAR(255) NULL     DEFAULT NULL,
+  `scope`          VARCHAR(255) NULL     DEFAULT NULL,
   `status`         VARCHAR(10)  NULL     DEFAULT NULL,
   `expiresAt`      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `lastModifiedAt` TIMESTAMP    NOT NULL DEFAULT '0000-00-00 00:00:00'
@@ -319,17 +319,17 @@ CREATE TABLE IF NOT EXISTS `kanban`.`oauth_approvals` (
 -- Table `kanban`.`oauth_client_details`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `kanban`.`oauth_client_details` (
-  `client_id`               VARCHAR(256)  NOT NULL,
-  `resource_ids`            VARCHAR(256)  NULL DEFAULT NULL,
-  `client_secret`           VARCHAR(256)  NULL DEFAULT NULL,
-  `scope`                   VARCHAR(256)  NULL DEFAULT NULL,
-  `authorized_grant_types`  VARCHAR(256)  NULL DEFAULT NULL,
-  `web_server_redirect_uri` VARCHAR(256)  NULL DEFAULT NULL,
-  `authorities`             VARCHAR(256)  NULL DEFAULT NULL,
+  `client_id`               VARCHAR(255)  NOT NULL,
+  `resource_ids`            VARCHAR(255)  NULL DEFAULT NULL,
+  `client_secret`           VARCHAR(255)  NULL DEFAULT NULL,
+  `scope`                   VARCHAR(255)  NULL DEFAULT NULL,
+  `authorized_grant_types`  VARCHAR(255)  NULL DEFAULT NULL,
+  `web_server_redirect_uri` VARCHAR(255)  NULL DEFAULT NULL,
+  `authorities`             VARCHAR(255)  NULL DEFAULT NULL,
   `access_token_validity`   INT(11)       NULL DEFAULT NULL,
   `refresh_token_validity`  INT(11)       NULL DEFAULT NULL,
   `additional_information`  VARCHAR(4096) NULL DEFAULT NULL,
-  `autoapprove`             VARCHAR(256)  NULL DEFAULT NULL,
+  `autoapprove`             VARCHAR(255)  NULL DEFAULT NULL,
   PRIMARY KEY (`client_id`)
 )
   ENGINE = InnoDB
@@ -341,11 +341,11 @@ CREATE TABLE IF NOT EXISTS `kanban`.`oauth_client_details` (
 -- Table `kanban`.`oauth_client_token`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `kanban`.`oauth_client_token` (
-  `token_id`          VARCHAR(256) NULL DEFAULT NULL,
+  `token_id`          VARCHAR(255) NULL DEFAULT NULL,
   `token`             BLOB         NULL DEFAULT NULL,
-  `authentication_id` VARCHAR(256) NOT NULL,
-  `user_name`         VARCHAR(256) NULL DEFAULT NULL,
-  `client_id`         VARCHAR(256) NULL DEFAULT NULL,
+  `authentication_id` VARCHAR(255) NOT NULL,
+  `user_name`         VARCHAR(255) NULL DEFAULT NULL,
+  `client_id`         VARCHAR(255) NULL DEFAULT NULL,
   PRIMARY KEY (`authentication_id`)
 )
   ENGINE = InnoDB
@@ -357,7 +357,7 @@ CREATE TABLE IF NOT EXISTS `kanban`.`oauth_client_token` (
 -- Table `kanban`.`oauth_code`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `kanban`.`oauth_code` (
-  `code`           VARCHAR(256) NULL DEFAULT NULL,
+  `code`           VARCHAR(255) NULL DEFAULT NULL,
   `authentication` BLOB         NULL DEFAULT NULL
 )
   ENGINE = InnoDB
@@ -369,7 +369,7 @@ CREATE TABLE IF NOT EXISTS `kanban`.`oauth_code` (
 -- Table `kanban`.`oauth_refresh_token`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `kanban`.`oauth_refresh_token` (
-  `token_id`       VARCHAR(256) NULL DEFAULT NULL,
+  `token_id`       VARCHAR(255) NULL DEFAULT NULL,
   `token`          BLOB         NULL DEFAULT NULL,
   `authentication` BLOB         NULL DEFAULT NULL
 )
