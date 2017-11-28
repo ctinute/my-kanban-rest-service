@@ -8,16 +8,12 @@ public class ProjectDto {
     private Integer id;
     private String name;
     private String description;
-    private Boolean isPublic;
+    private boolean isPublic;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Integer teamId;
 
-//        @JsonIgnore
-//        private Collection<MemberDto> members;
-
-    public ProjectDto() {
-    }
+    public ProjectDto() {}
 
     public ProjectDto(Integer id, String name, String description, Boolean isPublic, Integer teamId) {
         this.id = id;
@@ -33,9 +29,6 @@ public class ProjectDto {
         this.description = project.getDescription();
         this.isPublic = project.getIsPublic();
         this.teamId = project.getTeam() != null ? project.getTeam().getId() : null;
-//            members = new ArrayList<>();
-//            for (ProjectMember pm : project.getProjectMembers())
-//                members.add(new MemberDto(pm));
     }
 
     public Integer getId() {
@@ -62,11 +55,11 @@ public class ProjectDto {
         this.description = description;
     }
 
-    public Boolean getPublic() {
+    public boolean isPublic() {
         return isPublic;
     }
 
-    public void setPublic(Boolean aPublic) {
+    public void setPublic(boolean aPublic) {
         isPublic = aPublic;
     }
 

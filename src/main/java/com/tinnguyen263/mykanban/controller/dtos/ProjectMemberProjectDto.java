@@ -13,7 +13,7 @@ public class ProjectMemberProjectDto extends ProjectDto {
         this.isAdmin = isAdmin;
     }
 
-    public boolean getAdmin() {
+    public boolean isAdmin() {
         return isAdmin;
     }
 

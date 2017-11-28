@@ -1,8 +1,7 @@
 package com.tinnguyen263.mykanban.controller;
 
 import com.tinnguyen263.mykanban.controller.dtos.ProjectDto;
-import com.tinnguyen263.mykanban.controller.dtos.ProjectMemberDto;
-import com.tinnguyen263.mykanban.controller.dtos.ProjectMemberProjectWithTeamInfoDto;
+import com.tinnguyen263.mykanban.controller.dtos.ProjectMemberProjectDto;
 import com.tinnguyen263.mykanban.exceptions.NoModifyPermissionException;
 import com.tinnguyen263.mykanban.exceptions.NoViewPermissionException;
 import com.tinnguyen263.mykanban.model.Project;
@@ -23,46 +22,38 @@ import java.util.Collection;
 @RequestMapping("/api/projects")
 public class ProjectController {
 
-    @Autowired
-    private ProjectService projectService;
+    private final ProjectService projectService;
+
+    private final ProjectMemberService projectMemberService;
+
+    private final UserService userService;
+
+    private final TeamService teamService;
 
     @Autowired
-    private ProjectMemberService projectMemberService;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private TeamService teamService;
+    public ProjectController(ProjectService projectService, ProjectMemberService projectMemberService, UserService userService, TeamService teamService) {
+        this.projectService = projectService;
+        this.projectMemberService = projectMemberService;
+        this.userService = userService;
+        this.teamService = teamService;
+    }
 
     // get current user's projects
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public Collection<ProjectMemberProjectWithTeamInfoDto> getCurrentUsersProjects(Principal principal) {
+    public Collection<ProjectMemberProjectDto> getMyProjects(Principal principal) {
         User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
+
         Collection<ProjectMember> projectMembers = currentUser.getProjectMembers();
-        Collection<ProjectMemberProjectWithTeamInfoDto> memberProjectDtos = new ArrayList<>();
+        Collection<ProjectMemberProjectDto> projectDtos = new ArrayList<>();
         for (ProjectMember pm : projectMembers)
-            memberProjectDtos.add(new ProjectMemberProjectWithTeamInfoDto(projectService.findByKey(pm.getProjectMemberPK().getProjectId()), pm.getAdmin()));
-        return memberProjectDtos;
-    }
-
-    // create new project
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    public ProjectDto addProject(@RequestBody ProjectDto project, Principal principal) {
-        User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
-
-        // TODO: turn these command into 1 transaction
-        Project newProject = projectService.saveOrUpdate(toEntity(project));
-        ProjectMember projectMember = new ProjectMember(newProject, currentUser, true);
-        projectMemberService.saveOrUpdate(projectMember);
-
-        return new ProjectDto(newProject);
+            projectDtos.add(new ProjectMemberProjectDto(pm.getProject(), pm.getAdmin()));
+        return projectDtos;
     }
 
 
-    // get specific project
+    // get project
     @RequestMapping(value = "/{projectId}", method = RequestMethod.GET)
-    public ProjectDto getSpecificProject(@PathVariable Integer projectId, Principal principal) throws NoViewPermissionException {
+    public ProjectDto getProject(@PathVariable Integer projectId, Principal principal) throws NoViewPermissionException {
         User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
         Project project = projectService.findByKey(projectId);
 
@@ -74,9 +65,22 @@ public class ProjectController {
         return new ProjectDto(project);
     }
 
-    // update specific project
-    @RequestMapping(value = "/{projectId", method = RequestMethod.PUT)
-    public ProjectDto updateSpecificProject(@PathVariable Integer projectId,
+    // create new project
+    @RequestMapping(value = "", method = RequestMethod.POST)
+    public ProjectDto addProject(@RequestBody ProjectDto project,
+                                 Principal principal) {
+        User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
+
+        Project newProject = projectService.saveOrUpdate(toEntity(project));
+        ProjectMember projectMember = new ProjectMember(newProject, currentUser, true);
+        projectMemberService.saveOrUpdate(projectMember);
+
+        return new ProjectDto(newProject);
+    }
+
+    // update  project
+    @RequestMapping(value = "/{projectId}", method = RequestMethod.PUT)
+    public ProjectDto updateProject(@PathVariable Integer projectId,
                                             @RequestBody ProjectDto project,
                                             Principal principal) throws NoModifyPermissionException {
         User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
@@ -90,15 +94,15 @@ public class ProjectController {
         // ONLY update basic fields
         oldProject.setName(project.getName());
         oldProject.setDescription(project.getDescription());
-        oldProject.setIsPublic(project.getPublic());
-        oldProject.setTeam(teamService.findByKey(project.getTeamId()));
+        oldProject.setIsPublic(project.isPublic());
+        oldProject.setTeam(teamService.findByKey(projectId));
 
         return new ProjectDto(projectService.saveOrUpdate(oldProject));
     }
 
-    // delete specific project
+    // delete  project
     @RequestMapping(value = "/{projectId}", method = RequestMethod.DELETE)
-    public void deleteSpecificProject(@PathVariable Integer projectId,
+    public void deleteProject(@PathVariable Integer projectId,
                                       Principal principal) throws NoModifyPermissionException {
         User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
 
@@ -107,33 +111,11 @@ public class ProjectController {
             throw new NoModifyPermissionException();
         }
 
-        projectService.deleteByKey(projectId);
+        projectService.deleteByKey(projectId);  // TODO: not working, don't know why =_=!
     }
-
-
-    //get members of specific project
-    @RequestMapping(value = "/{projectId}/members", method = RequestMethod.GET)
-    public Collection<ProjectMemberDto> getMembersOfSpecificProject(@PathVariable Integer projectId,
-                                                                    Principal principal) throws NoViewPermissionException {
-        User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
-        Project project = projectService.findByKey(projectId);
-
-        // deny if project is not public or user is not a member of this project
-        if (!project.getIsPublic() && !projectMemberService.checkIfUserIsMember(projectId, currentUser.getId())) {
-            throw new NoViewPermissionException();
-        }
-
-        Collection<ProjectMember> projectMembers = project.getProjectMembers();
-        Collection<ProjectMemberDto> memberDtos = new ArrayList<>();
-        for (ProjectMember pm : projectMembers)
-            memberDtos.add(new ProjectMemberDto(pm));
-        return memberDtos;
-    }
-
 
     // DTOs
-
-    public Project toEntity(ProjectDto projectDto) {
+    private Project toEntity(ProjectDto projectDto) {
         Project p = new Project();
         if (projectDto.getId() != null) {
             Project sp = projectService.findByKey(projectDto.getId());
@@ -142,19 +124,11 @@ public class ProjectController {
         }
         p.setName(projectDto.getName());
         p.setDescription(projectDto.getDescription());
-        p.setIsPublic(projectDto.getPublic());
+        p.setIsPublic(projectDto.isPublic());
         if (projectDto.getTeamId() != null)
             p.setTeam(teamService.findByKey(projectDto.getTeamId()));
         else
             p.setTeam(null);
-//            Collection<ProjectMember> projectMembers = new ArrayList<>();
-//            for (MemberDto pm : members)
-//                projectMembers.add(pm.toEntity(id));
-//            p.setProjectMembers(projectMembers);
         return p;
-    }
-
-    public ProjectMember toEntity(ProjectMemberDto projectMemberDto, Integer projectId) {
-        return new ProjectMember(projectService.findByKey(projectId), userService.findByKey(projectMemberDto.getMemberId()), projectMemberDto.getAdmin());
     }
 }

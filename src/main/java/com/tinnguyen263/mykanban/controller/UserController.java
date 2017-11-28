@@ -1,15 +1,12 @@
 package com.tinnguyen263.mykanban.controller;
 
+import com.tinnguyen263.mykanban.controller.dtos.ProjectDto;
 import com.tinnguyen263.mykanban.controller.dtos.TeamUserTeamDto;
 import com.tinnguyen263.mykanban.controller.dtos.UserDto;
 import com.tinnguyen263.mykanban.exceptions.EmailExistedException;
 import com.tinnguyen263.mykanban.exceptions.UsernameExistedException;
-import com.tinnguyen263.mykanban.model.Team;
-import com.tinnguyen263.mykanban.model.TeamUser;
-import com.tinnguyen263.mykanban.model.User;
-import com.tinnguyen263.mykanban.service.TeamService;
-import com.tinnguyen263.mykanban.service.TeamUserService;
-import com.tinnguyen263.mykanban.service.UserService;
+import com.tinnguyen263.mykanban.model.*;
+import com.tinnguyen263.mykanban.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,12 +21,16 @@ public class UserController {
     private final UserService userService;
     private final TeamUserService teamUserService;
     private final TeamService teamService;
+    private final ProjectService projectService;
+    private final ProjectMemberService projectMemberService;
 
     @Autowired
-    public UserController(UserService userService, TeamUserService teamUserService, TeamService teamService) {
+    public UserController(UserService userService, TeamUserService teamUserService, TeamService teamService, ProjectService projectService, ProjectMemberService projectMemberService) {
         this.userService = userService;
         this.teamUserService = teamUserService;
         this.teamService = teamService;
+        this.projectService = projectService;
+        this.projectMemberService = projectMemberService;
     }
 
     /*
@@ -125,6 +126,30 @@ public class UserController {
         return teamUserTeamDtos;
     }
 
+
+    /*
+    * PROJECTS
+    * */
+    @RequestMapping(value = "/{userId}/projects", method = RequestMethod.GET)
+    public Collection<ProjectDto> getProjectsOfSpecificUser(@PathVariable Integer userId,
+                                                            Principal principal) {
+        User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
+        User user = userService.findByKey(userId);
+        Collection<ProjectMember> projectMembers = user.getProjectMembers();
+        Collection<ProjectDto> accessibleProjectDtoList = new ArrayList<>();
+        for (ProjectMember pm : projectMembers) {
+            Project p = projectService.findByKey(pm.getProjectMemberPK().getProjectId());
+            if (p.getIsPublic() || projectMemberService.checkIfUserIsMember(p.getId(), currentUser.getId()))
+                accessibleProjectDtoList.add(new ProjectDto(p));
+        }
+        return accessibleProjectDtoList;
+    }
+
+
+
+    /*
+    * DTO converter
+    * */
 
     private User toEntity(UserDto userDto) {
         User user = new User();

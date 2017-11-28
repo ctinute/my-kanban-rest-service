@@ -1,13 +1,13 @@
 package com.tinnguyen263.mykanban.controller;
 
+import com.tinnguyen263.mykanban.controller.dtos.ProjectDto;
 import com.tinnguyen263.mykanban.controller.dtos.TeamDto;
 import com.tinnguyen263.mykanban.controller.dtos.TeamUserTeamDto;
-import com.tinnguyen263.mykanban.controller.dtos.TeamUserUserDto;
 import com.tinnguyen263.mykanban.exceptions.NoModifyPermissionException;
 import com.tinnguyen263.mykanban.exceptions.NoViewPermissionException;
+import com.tinnguyen263.mykanban.model.Project;
 import com.tinnguyen263.mykanban.model.Team;
 import com.tinnguyen263.mykanban.model.TeamUser;
-import com.tinnguyen263.mykanban.model.TeamUserPK;
 import com.tinnguyen263.mykanban.model.User;
 import com.tinnguyen263.mykanban.service.TeamService;
 import com.tinnguyen263.mykanban.service.TeamUserService;
@@ -35,10 +35,6 @@ public class TeamController {
     }
 
 
-    /*
-    * mapping "/api/teams"
-    * */
-
     // get current user's teams
     @RequestMapping(value = "", method = RequestMethod.GET, produces = {"application/json"})
     public Collection<TeamUserTeamDto> getMyTeams(Principal principal) {
@@ -57,7 +53,6 @@ public class TeamController {
         // save team and get id back
         Team newTeam = teamService.saveOrUpdate(toEntity(team));
 
-
         // user who create team will be default team admin
         User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
         TeamUser t = new TeamUser(newTeam, currentUser, true);
@@ -65,11 +60,6 @@ public class TeamController {
 
         return new TeamDto(newTeam);
     }
-
-
-    /*
-    * mapping "/api/teams/(teamId)
-    * */
 
     // get specific team
     @RequestMapping(value = "/{teamId}", method = RequestMethod.GET, produces = {"application/json"})
@@ -116,48 +106,24 @@ public class TeamController {
         teamService.deleteByKey(teamId);
     }
 
-
-    /*
-    * mapping "/api/teams/{teamId}/users"
-    * */
-
-    // get members of a specific team
-    @RequestMapping(value = "/{teamId}/users", method = RequestMethod.GET)
-    public Collection<TeamUserUserDto> getMembers(@PathVariable Integer teamId, Principal principal) throws NoViewPermissionException {
+    @RequestMapping(value = "/{teamId}/projects", method = RequestMethod.GET)
+    public Collection<ProjectDto> getProjectsOfTeam(@PathVariable Integer teamId,
+                                          Principal principal) throws NoViewPermissionException {
         User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
         Team team = teamService.findByKey(teamId);
 
         if (!team.getPublic() && !teamUserService.checkIfUserIsMember(teamId, currentUser.getId()))
             throw new NoViewPermissionException();
 
-        Collection<TeamUser> teamUsers = team.getTeamUsers();
-        Collection<TeamUserUserDto> teamUserUserDtos = new ArrayList<>();
-        for (TeamUser tu : teamUsers)
-            teamUserUserDtos.add(new TeamUserUserDto(tu.getUser(), tu.getAdmin()));
-        return teamUserUserDtos;
-    }
-
-    /*
-    * mapping /api/teams/{teamId}/users/{userId}
-    * */
-    @RequestMapping(value = "/{teamId}/users/{userId}", method = RequestMethod.PUT)
-    public void changeMemberRole(@PathVariable Integer teamId,
-                                 @PathVariable Integer userId,
-                                 @RequestBody boolean isAdmin,
-                                 Principal principal) throws NoModifyPermissionException {
-        User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
-        Team team = teamService.findByKey(teamId);
-        User user = userService.findByKey(userId);
-
-        if (!teamUserService.checkIfUserIsAdmin(teamId, currentUser.getId()))
-            throw new NoModifyPermissionException();
-
-        TeamUser t = teamUserService.findByKey(new TeamUserPK(teamId, userId));
-        t.setAdmin(isAdmin);
-        teamUserService.saveOrUpdate(t);
+        Collection<Project> projects = team.getProjects();
+        Collection<ProjectDto> projectDtos = new ArrayList<>();
+        for (Project p : projects)
+            projectDtos.add(new ProjectDto(p));
+        return projectDtos;
     }
 
 
+    // DTO converter
     private Team toEntity(TeamDto teamDto) {
         return new Team(teamDto.getName(), teamDto.getDescription(), teamDto.getPublic());
     }

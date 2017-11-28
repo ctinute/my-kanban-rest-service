@@ -74,6 +74,14 @@ public class Team {
         this.teamUsers = teamUsers;
     }
 
+    public Collection<Project> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(Collection<Project> projects) {
+        this.projects = projects;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
