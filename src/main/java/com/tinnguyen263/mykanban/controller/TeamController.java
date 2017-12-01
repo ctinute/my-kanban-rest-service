@@ -3,8 +3,8 @@ package com.tinnguyen263.mykanban.controller;
 import com.tinnguyen263.mykanban.controller.dtos.ProjectDto;
 import com.tinnguyen263.mykanban.controller.dtos.TeamDto;
 import com.tinnguyen263.mykanban.controller.dtos.TeamUserTeamDto;
+import com.tinnguyen263.mykanban.exceptions.NoAccessPermissionException;
 import com.tinnguyen263.mykanban.exceptions.NoModifyPermissionException;
-import com.tinnguyen263.mykanban.exceptions.NoViewPermissionException;
 import com.tinnguyen263.mykanban.model.Project;
 import com.tinnguyen263.mykanban.model.Team;
 import com.tinnguyen263.mykanban.model.TeamUser;
@@ -64,12 +64,12 @@ public class TeamController {
     // get specific team
     @RequestMapping(value = "/{teamId}", method = RequestMethod.GET, produces = {"application/json"})
     public TeamDto getTeam(@PathVariable Integer teamId,
-                           Principal principal) throws NoViewPermissionException {
+                           Principal principal) throws NoAccessPermissionException {
         User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
         Team team = teamService.findByKey(teamId);
 
         if (!team.getPublic() && !teamUserService.checkIfUserIsMember(teamId, currentUser.getId()))
-            throw new NoViewPermissionException();
+            throw new NoAccessPermissionException();
 
         return new TeamDto(team);
     }
@@ -108,12 +108,12 @@ public class TeamController {
 
     @RequestMapping(value = "/{teamId}/projects", method = RequestMethod.GET)
     public Collection<ProjectDto> getProjectsOfTeam(@PathVariable Integer teamId,
-                                          Principal principal) throws NoViewPermissionException {
+                                                    Principal principal) throws NoAccessPermissionException {
         User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
         Team team = teamService.findByKey(teamId);
 
         if (!team.getPublic() && !teamUserService.checkIfUserIsMember(teamId, currentUser.getId()))
-            throw new NoViewPermissionException();
+            throw new NoAccessPermissionException();
 
         Collection<Project> projects = team.getProjects();
         Collection<ProjectDto> projectDtos = new ArrayList<>();

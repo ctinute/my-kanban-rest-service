@@ -2,8 +2,8 @@ package com.tinnguyen263.mykanban.controller;
 
 import com.tinnguyen263.mykanban.controller.dtos.NewTeamMemberDto;
 import com.tinnguyen263.mykanban.controller.dtos.TeamUserUserDto;
+import com.tinnguyen263.mykanban.exceptions.NoAccessPermissionException;
 import com.tinnguyen263.mykanban.exceptions.NoModifyPermissionException;
-import com.tinnguyen263.mykanban.exceptions.NoViewPermissionException;
 import com.tinnguyen263.mykanban.model.Team;
 import com.tinnguyen263.mykanban.model.TeamUser;
 import com.tinnguyen263.mykanban.model.TeamUserPK;
@@ -35,12 +35,12 @@ public class TeamMemberController {
 
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public Collection<TeamUserUserDto> getMembers(@PathVariable Integer teamId, Principal principal) throws NoViewPermissionException {
+    public Collection<TeamUserUserDto> getMembers(@PathVariable Integer teamId, Principal principal) throws NoAccessPermissionException {
         User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
         Team team = teamService.findByKey(teamId);
 
         if (!team.getPublic() && !teamUserService.checkIfUserIsMember(teamId, currentUser.getId()))
-            throw new NoViewPermissionException();
+            throw new NoAccessPermissionException();
 
         Collection<TeamUser> teamUsers = team.getTeamUsers();
         Collection<TeamUserUserDto> teamUserUserDtos = new ArrayList<>();

@@ -2,8 +2,8 @@ package com.tinnguyen263.mykanban.controller;
 
 import com.tinnguyen263.mykanban.controller.dtos.ProjectDto;
 import com.tinnguyen263.mykanban.controller.dtos.ProjectMemberProjectDto;
+import com.tinnguyen263.mykanban.exceptions.NoAccessPermissionException;
 import com.tinnguyen263.mykanban.exceptions.NoModifyPermissionException;
-import com.tinnguyen263.mykanban.exceptions.NoViewPermissionException;
 import com.tinnguyen263.mykanban.model.Project;
 import com.tinnguyen263.mykanban.model.ProjectMember;
 import com.tinnguyen263.mykanban.model.User;
@@ -53,13 +53,13 @@ public class ProjectController {
 
     // get project
     @RequestMapping(value = "/{projectId}", method = RequestMethod.GET)
-    public ProjectDto getProject(@PathVariable Integer projectId, Principal principal) throws NoViewPermissionException {
+    public ProjectDto getProject(@PathVariable Integer projectId, Principal principal) throws NoAccessPermissionException {
         User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
         Project project = projectService.findByKey(projectId);
 
         // deny if project is not public or user is not a member of this project
         if (!project.getIsPublic() && !projectMemberService.checkIfUserIsMember(projectId, currentUser.getId())) {
-            throw new NoViewPermissionException();
+            throw new NoAccessPermissionException();
         }
 
         return new ProjectDto(project);

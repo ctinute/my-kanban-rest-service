@@ -13,7 +13,7 @@ public class Project {
     @Column(name = "name", nullable = false, length = 128)
     private String name;
 
-    @Column(name = "description", nullable = true)
+    @Column(name = "description")
     private String description;
 
     @Column(name = "is_public", nullable = false)
@@ -25,6 +25,12 @@ public class Project {
 
     @OneToMany(mappedBy = "project")
     private Collection<ProjectMember> projectMembers;
+
+    @OneToMany(mappedBy = "project")
+    private Collection<Label> labels;
+
+    @OneToMany(mappedBy = "project")
+    private Collection<MColumn> mColumns;
 
     public Project() {
     }
@@ -83,28 +89,27 @@ public class Project {
         this.projectMembers = projectMembers;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Project project = (Project) o;
-
-        if (id != null ? !id.equals(project.id) : project.id != null) return false;
-        if (name != null ? !name.equals(project.name) : project.name != null) return false;
-        if (description != null ? !description.equals(project.description) : project.description != null) return false;
-        if (isPublic != null ? !isPublic.equals(project.isPublic) : project.isPublic != null) return false;
-
-        return true;
+    public Collection<Label> getLabels() {
+        return labels;
     }
 
-    @Override
-    public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (isPublic != null ? isPublic.hashCode() : 0);
-        return result;
+    public void setLabels(Collection<Label> labels) {
+        this.labels = labels;
     }
 
+    public Boolean getPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(Boolean aPublic) {
+        isPublic = aPublic;
+    }
+
+    public Collection<MColumn> getmColumns() {
+        return mColumns;
+    }
+
+    public void setmColumns(Collection<MColumn> mColumns) {
+        this.mColumns = mColumns;
+    }
 }
