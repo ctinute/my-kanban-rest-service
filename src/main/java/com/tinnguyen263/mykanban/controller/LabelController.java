@@ -3,6 +3,7 @@ package com.tinnguyen263.mykanban.controller;
 import com.tinnguyen263.mykanban.controller.dtos.LabelDto;
 import com.tinnguyen263.mykanban.exceptions.NoAccessPermissionException;
 import com.tinnguyen263.mykanban.model.Label;
+import com.tinnguyen263.mykanban.model.Project;
 import com.tinnguyen263.mykanban.service.AuthorizationService;
 import com.tinnguyen263.mykanban.service.LabelService;
 import com.tinnguyen263.mykanban.service.ProjectService;
@@ -10,11 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Collection;
 
 @RestController
-@RequestMapping(value = "/api/projects/{projectId}/labels")
+@RequestMapping(value = "/api/labels")
 public class LabelController {
 
     private final LabelService labelService;
@@ -28,28 +27,13 @@ public class LabelController {
         this.authorizationService = authorizationService;
     }
 
-    // get labels of project
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    public Collection<LabelDto> getLabels(@PathVariable Integer projectId,
-                                          Principal principal) throws NoAccessPermissionException {
-        if (!authorizationService.userCanAccessProject(Utils.getUsernameFromPrincipal(principal), projectId))
-            throw new NoAccessPermissionException();
-
-        Collection<Label> labels = projectService.findByKey(projectId).getLabels();
-        Collection<LabelDto> labelDtos = new ArrayList<>();
-        for (Label label : labels) {
-            labelDtos.add(new LabelDto(label));
-        }
-
-        return labelDtos;
-    }
-
     // get label
     @RequestMapping(value = "/{labelId}", method = RequestMethod.GET)
-    public LabelDto getLabel(@PathVariable Integer projectId,
-                             @PathVariable Integer labelId,
+    public LabelDto getLabel(@PathVariable Integer labelId,
                              Principal principal) throws NoAccessPermissionException {
-        if (!authorizationService.userCanAccessProject(Utils.getUsernameFromPrincipal(principal), projectId))
+        Label label = labelService.findByKey(labelId);
+
+        if (!authorizationService.userCanAccessProject(Utils.getUsernameFromPrincipal(principal), label.getProject().getId()))
             throw new NoAccessPermissionException();
 
         return new LabelDto(labelService.findByKey(labelId));
@@ -57,43 +41,52 @@ public class LabelController {
 
     // add label
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public void addLabel(@PathVariable Integer projectId,
-                         @RequestBody LabelDto labelDto,
-                         Principal principal) throws NoAccessPermissionException {
-        if (!authorizationService.userCanAccessProject(Utils.getUsernameFromPrincipal(principal), projectId))
+    public void addLabel(@RequestBody LabelDto labelDto,
+                         Principal principal) throws Exception {
+        // check projectId field
+        if (labelDto.getProjectId() == null) {
+            throw new Exception(); // TODO: missing field
+        }
+
+        // check project
+        Project project = projectService.findByKey(labelDto.getProjectId());
+
+        // check permission
+        if (!authorizationService.userCanAccessProject(Utils.getUsernameFromPrincipal(principal), project.getId()))
             throw new NoAccessPermissionException();
-        Label label = toEntity(labelDto);
-        label.setProject(projectService.findByKey(projectId));
+
+        Label label = Converter.toEntity(labelDto);
+        label.setProject(project);
+
         labelService.saveOrUpdate(label);
     }
 
     // edit label
     @RequestMapping(value = "/{labelId}", method = RequestMethod.PUT)
-    public void editLabel(@PathVariable Integer projectId,
-                          @PathVariable Integer labelId,
+    public void editLabel(@PathVariable Integer labelId,
                           @RequestBody LabelDto labelDto,
-                          Principal principal) throws NoAccessPermissionException {
-        if (!authorizationService.userCanAccessProject(Utils.getUsernameFromPrincipal(principal), projectId))
+                          Principal principal) throws Exception {
+        Label label = labelService.findByKey(labelId);
+
+        if (!authorizationService.userCanAccessProject(Utils.getUsernameFromPrincipal(principal), label.getProject().getId()))
             throw new NoAccessPermissionException();
 
-        Label oLabel = labelService.findByKey(labelId);
-        oLabel.setName(labelDto.getName());
-        oLabel.setColor(labelDto.getColor());
-        labelService.saveOrUpdate(oLabel);
+        // only 2 filed can be changed
+        label.setName(labelDto.getName());
+        label.setColor(labelDto.getColor());
+
+        labelService.saveOrUpdate(label);
     }
 
     // delete label
     @RequestMapping(value = "/{labelId}", method = RequestMethod.DELETE)
-    public void deleteLabel(@PathVariable Integer projectId,
-                            @PathVariable Integer labelId,
+    public void deleteLabel(@PathVariable Integer labelId,
                             Principal principal) throws NoAccessPermissionException {
-        if (!authorizationService.userCanAccessProject(Utils.getUsernameFromPrincipal(principal), projectId))
+        Label label = labelService.findByKey(labelId);
+
+        if (!authorizationService.userCanAccessProject(Utils.getUsernameFromPrincipal(principal), label.getProject().getId()))
             throw new NoAccessPermissionException();
+
         labelService.deleteByKey(labelId);
     }
-
-    private Label toEntity(LabelDto labelDto) {
-        return new Label(labelDto.getName(), labelDto.getColor());
-    }
-
 }

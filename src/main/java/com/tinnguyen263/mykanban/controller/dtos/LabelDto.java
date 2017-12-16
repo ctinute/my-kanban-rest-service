@@ -10,12 +10,12 @@ public class LabelDto {
     private String color;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private int projectId;
+    private Integer projectId;
 
     public LabelDto() {
     }
 
-    public LabelDto(Integer id, String name, String color, int projectId) {
+    public LabelDto(Integer id, String name, String color, Integer projectId) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -52,11 +52,11 @@ public class LabelDto {
         this.color = color;
     }
 
-    public int getProjectId() {
+    public Integer getProjectId() {
         return projectId;
     }
 
-    public void setProjectId(int projectId) {
+    public void setProjectId(Integer projectId) {
         this.projectId = projectId;
     }
 }

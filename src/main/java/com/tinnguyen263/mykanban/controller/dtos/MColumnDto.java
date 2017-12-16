@@ -12,7 +12,7 @@ public class MColumnDto {
     private int cardLimit;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private int projectId;
+    private Integer projectId;
 
     public MColumnDto() {
     }
@@ -72,11 +72,11 @@ public class MColumnDto {
         this.cardLimit = cardLimit;
     }
 
-    public int getProjectId() {
+    public Integer getProjectId() {
         return projectId;
     }
 
-    public void setProjectId(int projectId) {
+    public void setProjectId(Integer projectId) {
         this.projectId = projectId;
     }
 }

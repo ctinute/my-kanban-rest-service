@@ -1,6 +1,7 @@
 package com.tinnguyen263.mykanban.model;
 
 import javax.persistence.*;
+import java.util.Collection;
 
 @Entity
 public class Label {
@@ -18,6 +19,9 @@ public class Label {
     @ManyToOne
     @JoinColumn(name = "project_id", referencedColumnName = "id")
     private Project project;
+
+    @ManyToMany(mappedBy = "labels")
+    private Collection<Card> cards;
 
     public Label() {
     }
@@ -57,5 +61,13 @@ public class Label {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public Collection<Card> getCards() {
+        return cards;
+    }
+
+    public void setCards(Collection<Card> cards) {
+        this.cards = cards;
     }
 }
