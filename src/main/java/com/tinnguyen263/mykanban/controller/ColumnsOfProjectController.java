@@ -45,7 +45,7 @@ public class ColumnsOfProjectController {
 
     // add column to project
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public MColumnDto addColumn(@RequestParam int projectId,
+    public MColumnDto addColumn(@PathVariable int projectId,
                                 @RequestBody MColumnDto mColumnDto,
                                 Principal principal) throws NoAccessPermissionException {
         String username = Utils.getUsernameFromPrincipal(principal);

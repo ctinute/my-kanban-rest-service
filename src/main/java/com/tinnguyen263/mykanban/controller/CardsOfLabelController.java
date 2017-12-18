@@ -1,6 +1,6 @@
 package com.tinnguyen263.mykanban.controller;
 
-import com.tinnguyen263.mykanban.controller.dtos.LabelDto;
+import com.tinnguyen263.mykanban.controller.dtos.CardDto;
 import com.tinnguyen263.mykanban.exceptions.NoAccessPermissionException;
 import com.tinnguyen263.mykanban.model.Card;
 import com.tinnguyen263.mykanban.model.Label;
@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @RestController
-@RequestMapping("/api/cards/{cardId}/labels")
-public class LabelsOfCardController {
+@RequestMapping("/api/labels/{labelId}/cards")
+public class CardsOfLabelController {
 
     @Autowired
     private AuthorizationService authorizationService;
@@ -30,20 +30,19 @@ public class LabelsOfCardController {
     private LabelService labelService;
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public Collection<LabelDto> getLabelsOfCard(@PathVariable int cardId,
-                                                Principal principal) throws NoAccessPermissionException {
+    public Collection<CardDto> getCardsOfLabel(@PathVariable int labelId,
+                                               Principal principal) throws NoAccessPermissionException {
         String username = Utils.getUsernameFromPrincipal(principal);
-        Card card = cardService.findByKey(cardId);
-        Project project = card.getColumn().getProject();
+        Label label = labelService.findByKey(labelId);
+        Project project = label.getProject();
 
         if (!project.getPublic() && !authorizationService.userCanAccessProject(username, project.getId()))
             throw new NoAccessPermissionException();
 
-        Collection<Label> labels = card.getLabels();
-        Collection<LabelDto> labelDtos = new ArrayList<>();
-        for (Label label : labels) {
-            labelDtos.add(new LabelDto(label));
-        }
-        return labelDtos;
+        Collection<Card> cards = label.getCards();
+        Collection<CardDto> cardDtos = new ArrayList<>();
+        for (Card card : cards)
+            cardDtos.add(new CardDto(card));
+        return cardDtos;
     }
 }

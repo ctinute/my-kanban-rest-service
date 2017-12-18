@@ -21,4 +21,4 @@ REST API for my project management website powered by Spring Boot
 
 ### APIs
 
-Import Postman API collection: `https://www.getpostman.com/collections/9c6a31ba3401bf50692c` (last updated at 10:18 AM - Dec 1, 2017)
+Import Postman API collection: `https://www.getpostman.com/collections/9c6a31ba3401bf50692c` (last updated at 07:51 PM - Dec 18, 2017)
