@@ -40,28 +40,28 @@ CREATE TABLE IF NOT EXISTS `kanban`.`project` (
   DEFAULT CHARACTER SET = utf8
   ROW_FORMAT = DYNAMIC;
 
--- -----------------------------------------------------
--- Table `kanban`.`activity`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `kanban`.`activity` (
-  `project_id` INT(11)     NOT NULL,
-  `user_id`    INT(11)     NOT NULL,
-  `operation`  VARCHAR(64) NOT NULL,
-  `obj_type`   VARCHAR(64) NOT NULL,
-  `obj_id`     INT(11)     NOT NULL,
-  `time`       TIME        NOT NULL,
-  PRIMARY KEY (`project_id`, `user_id`),
-  INDEX `activity_user` (`user_id` ASC),
-  CONSTRAINT `activity_project`
-  FOREIGN KEY (`project_id`)
-  REFERENCES `kanban`.`project` (`id`),
-  CONSTRAINT `activity_user`
-  FOREIGN KEY (`user_id`)
-  REFERENCES `kanban`.`user` (`id`)
-)
-  ENGINE = InnoDB
-  DEFAULT CHARACTER SET = utf8;
-
+-- -- -----------------------------------------------------
+-- -- Table `kanban`.`activity`
+-- -- -----------------------------------------------------
+-- CREATE TABLE IF NOT EXISTS `kanban`.`activity` (
+--   `project_id` INT(11)     NOT NULL,
+--   `user_id`    INT(11)     NOT NULL,
+--   `operation`  VARCHAR(64) NOT NULL,
+--   `obj_type`   VARCHAR(64) NOT NULL,
+--   `obj_id`     INT(11)     NOT NULL,
+--   `time`       TIME        NOT NULL,
+--   PRIMARY KEY (`project_id`, `user_id`),
+--   INDEX `activity_user` (`user_id` ASC),
+--   CONSTRAINT `activity_project`
+--   FOREIGN KEY (`project_id`)
+--   REFERENCES `kanban`.`project` (`id`),
+--   CONSTRAINT `activity_user`
+--   FOREIGN KEY (`user_id`)
+--   REFERENCES `kanban`.`user` (`id`)
+-- )
+--   ENGINE = InnoDB
+--   DEFAULT CHARACTER SET = utf8;
+--
 
 -- -----------------------------------------------------
 -- Table `kanban`.`mcolumn`
@@ -104,103 +104,103 @@ CREATE TABLE IF NOT EXISTS `kanban`.`card` (
   ROW_FORMAT = DYNAMIC;
 
 
--- -----------------------------------------------------
--- Table `kanban`.`attachment`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `kanban`.`attachment` (
-  `card_id`   INT(11)      NOT NULL,
-  `user_id`   INT(11)      NOT NULL,
-  `file_name` VARCHAR(128) NOT NULL,
-  `path`      VARCHAR(128) NOT NULL,
-  `time`      TIME         NOT NULL,
-  PRIMARY KEY (`card_id`, `user_id`),
-  INDEX `attachment_user` (`user_id` ASC),
-  CONSTRAINT `attachment_card`
-  FOREIGN KEY (`card_id`)
-  REFERENCES `kanban`.`card` (`id`),
-  CONSTRAINT `attachment_user`
-  FOREIGN KEY (`user_id`)
-  REFERENCES `kanban`.`user` (`id`)
-)
-  ENGINE = InnoDB
-  DEFAULT CHARACTER SET = utf8;
+-- -- -----------------------------------------------------
+-- -- Table `kanban`.`attachment`
+-- -- -----------------------------------------------------
+-- CREATE TABLE IF NOT EXISTS `kanban`.`attachment` (
+--   `card_id`   INT(11)      NOT NULL,
+--   `user_id`   INT(11)      NOT NULL,
+--   `file_name` VARCHAR(128) NOT NULL,
+--   `path`      VARCHAR(128) NOT NULL,
+--   `time`      TIME         NOT NULL,
+--   PRIMARY KEY (`card_id`, `user_id`),
+--   INDEX `attachment_user` (`user_id` ASC),
+--   CONSTRAINT `attachment_card`
+--   FOREIGN KEY (`card_id`)
+--   REFERENCES `kanban`.`card` (`id`),
+--   CONSTRAINT `attachment_user`
+--   FOREIGN KEY (`user_id`)
+--   REFERENCES `kanban`.`user` (`id`)
+-- )
+--   ENGINE = InnoDB
+--   DEFAULT CHARACTER SET = utf8;
 
 
--- -----------------------------------------------------
--- Table `kanban`.`card_assignment`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `kanban`.`card_assignment` (
-  `card_id` INT(11) NOT NULL,
-  `user_id` INT(11) NOT NULL,
-  PRIMARY KEY (`card_id`, `user_id`),
-  INDEX `card_assignment_user` (`user_id` ASC),
-  CONSTRAINT `card_assignment_card`
-  FOREIGN KEY (`card_id`)
-  REFERENCES `kanban`.`card` (`id`),
-  CONSTRAINT `card_assignment_user`
-  FOREIGN KEY (`user_id`)
-  REFERENCES `kanban`.`user` (`id`)
-)
-  ENGINE = InnoDB
-  DEFAULT CHARACTER SET = utf8;
+-- -- -----------------------------------------------------
+-- -- Table `kanban`.`card_assignment`
+-- -- -----------------------------------------------------
+-- CREATE TABLE IF NOT EXISTS `kanban`.`card_assignment` (
+--   `card_id` INT(11) NOT NULL,
+--   `user_id` INT(11) NOT NULL,
+--   PRIMARY KEY (`card_id`, `user_id`),
+--   INDEX `card_assignment_user` (`user_id` ASC),
+--   CONSTRAINT `card_assignment_card`
+--   FOREIGN KEY (`card_id`)
+--   REFERENCES `kanban`.`card` (`id`),
+--   CONSTRAINT `card_assignment_user`
+--   FOREIGN KEY (`user_id`)
+--   REFERENCES `kanban`.`user` (`id`)
+-- )
+--   ENGINE = InnoDB
+--   DEFAULT CHARACTER SET = utf8;
 
 
--- -----------------------------------------------------
--- Table `kanban`.`card_subscription`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `kanban`.`card_subscription` (
-  `card_id` INT(11) NOT NULL,
-  `user_id` INT(11) NOT NULL,
-  PRIMARY KEY (`card_id`, `user_id`),
-  INDEX `card_subscription_user` (`user_id` ASC),
-  CONSTRAINT `card_subscription_card`
-  FOREIGN KEY (`card_id`)
-  REFERENCES `kanban`.`card` (`id`),
-  CONSTRAINT `card_subscription_user`
-  FOREIGN KEY (`user_id`)
-  REFERENCES `kanban`.`user` (`id`)
-)
-  ENGINE = InnoDB
-  DEFAULT CHARACTER SET = utf8;
+-- -- -----------------------------------------------------
+-- -- Table `kanban`.`card_subscription`
+-- -- -----------------------------------------------------
+-- CREATE TABLE IF NOT EXISTS `kanban`.`card_subscription` (
+--   `card_id` INT(11) NOT NULL,
+--   `user_id` INT(11) NOT NULL,
+--   PRIMARY KEY (`card_id`, `user_id`),
+--   INDEX `card_subscription_user` (`user_id` ASC),
+--   CONSTRAINT `card_subscription_card`
+--   FOREIGN KEY (`card_id`)
+--   REFERENCES `kanban`.`card` (`id`),
+--   CONSTRAINT `card_subscription_user`
+--   FOREIGN KEY (`user_id`)
+--   REFERENCES `kanban`.`user` (`id`)
+-- )
+--   ENGINE = InnoDB
+--   DEFAULT CHARACTER SET = utf8;
 
 
--- -----------------------------------------------------
--- Table `kanban`.`checklist`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `kanban`.`checklist` (
-  `id`      INT(11)      NOT NULL AUTO_INCREMENT,
-  `name`    VARCHAR(128) NOT NULL,
-  `card_id` INT(11)      NOT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `IX_Relationship31` (`card_id` ASC),
-  CONSTRAINT `card_checcklist`
-  FOREIGN KEY (`card_id`)
-  REFERENCES `kanban`.`card` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-)
-  ENGINE = InnoDB
-  DEFAULT CHARACTER SET = utf8
-  ROW_FORMAT = DYNAMIC;
+-- -- -----------------------------------------------------
+-- -- Table `kanban`.`checklist`
+-- -- -----------------------------------------------------
+-- CREATE TABLE IF NOT EXISTS `kanban`.`checklist` (
+--   `id`      INT(11)      NOT NULL AUTO_INCREMENT,
+--   `name`    VARCHAR(128) NOT NULL,
+--   `card_id` INT(11)      NOT NULL,
+--   PRIMARY KEY (`id`),
+--   INDEX `IX_Relationship31` (`card_id` ASC),
+--   CONSTRAINT `card_checcklist`
+--   FOREIGN KEY (`card_id`)
+--   REFERENCES `kanban`.`card` (`id`)
+--     ON DELETE CASCADE
+--     ON UPDATE CASCADE
+-- )
+--   ENGINE = InnoDB
+--   DEFAULT CHARACTER SET = utf8
+--   ROW_FORMAT = DYNAMIC;
 
 
--- -----------------------------------------------------
--- Table `kanban`.`checklist_option`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `kanban`.`checklist_option` (
-  `id`           INT(11)      NOT NULL AUTO_INCREMENT,
-  `name`         VARCHAR(128) NOT NULL,
-  `is_completed` TINYINT(1)   NOT NULL,
-  `checklist_id` INT(11)      NOT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `IX_Relationship29` (`checklist_id` ASC),
-  CONSTRAINT `checklist_checklist_option`
-  FOREIGN KEY (`checklist_id`)
-  REFERENCES `kanban`.`checklist` (`id`)
-)
-  ENGINE = InnoDB
-  DEFAULT CHARACTER SET = utf8
-  ROW_FORMAT = DYNAMIC;
+-- -- -----------------------------------------------------
+-- -- Table `kanban`.`checklist_option`
+-- -- -----------------------------------------------------
+-- CREATE TABLE IF NOT EXISTS `kanban`.`checklist_option` (
+--   `id`           INT(11)      NOT NULL AUTO_INCREMENT,
+--   `name`         VARCHAR(128) NOT NULL,
+--   `is_completed` TINYINT(1)   NOT NULL,
+--   `checklist_id` INT(11)      NOT NULL,
+--   PRIMARY KEY (`id`),
+--   INDEX `IX_Relationship29` (`checklist_id` ASC),
+--   CONSTRAINT `checklist_checklist_option`
+--   FOREIGN KEY (`checklist_id`)
+--   REFERENCES `kanban`.`checklist` (`id`)
+-- )
+--   ENGINE = InnoDB
+--   DEFAULT CHARACTER SET = utf8
+--   ROW_FORMAT = DYNAMIC;
 
 
 -- -----------------------------------------------------
@@ -225,25 +225,25 @@ CREATE TABLE IF NOT EXISTS `kanban`.`clientdetails` (
   ROW_FORMAT = DYNAMIC;
 
 
--- -----------------------------------------------------
--- Table `kanban`.`comment`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `kanban`.`comment` (
-  `card_id` INT(11)    NOT NULL,
-  `user_id` INT(11)    NOT NULL,
-  `content` MEDIUMTEXT NOT NULL,
-  `time`    TIME       NOT NULL,
-  PRIMARY KEY (`card_id`, `user_id`),
-  INDEX `comment_user` (`user_id` ASC),
-  CONSTRAINT `comment_card`
-  FOREIGN KEY (`card_id`)
-  REFERENCES `kanban`.`card` (`id`),
-  CONSTRAINT `comment_user`
-  FOREIGN KEY (`user_id`)
-  REFERENCES `kanban`.`user` (`id`)
-)
-  ENGINE = InnoDB
-  DEFAULT CHARACTER SET = utf8;
+-- -- -----------------------------------------------------
+-- -- Table `kanban`.`comment`
+-- -- -----------------------------------------------------
+-- CREATE TABLE IF NOT EXISTS `kanban`.`comment` (
+--   `card_id` INT(11)    NOT NULL,
+--   `user_id` INT(11)    NOT NULL,
+--   `content` MEDIUMTEXT NOT NULL,
+--   `time`    TIME       NOT NULL,
+--   PRIMARY KEY (`card_id`, `user_id`),
+--   INDEX `comment_user` (`user_id` ASC),
+--   CONSTRAINT `comment_card`
+--   FOREIGN KEY (`card_id`)
+--   REFERENCES `kanban`.`card` (`id`),
+--   CONSTRAINT `comment_user`
+--   FOREIGN KEY (`user_id`)
+--   REFERENCES `kanban`.`user` (`id`)
+-- )
+--   ENGINE = InnoDB
+--   DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
 -- Table `kanban`.`label`
