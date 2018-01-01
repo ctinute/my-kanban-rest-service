@@ -1,6 +1,7 @@
 package com.tinnguyen263.mykanban.controller;
 
 import com.tinnguyen263.mykanban.controller.dtos.LabelDto;
+import com.tinnguyen263.mykanban.exceptions.DataMissingException;
 import com.tinnguyen263.mykanban.exceptions.NoAccessPermissionException;
 import com.tinnguyen263.mykanban.model.Label;
 import com.tinnguyen263.mykanban.model.Project;
@@ -32,7 +33,6 @@ public class LabelController {
     public LabelDto getLabel(@PathVariable Integer labelId,
                              Principal principal) throws NoAccessPermissionException {
         Label label = labelService.findByKey(labelId);
-
         if (!authorizationService.userCanAccessProject(Utils.getUsernameFromPrincipal(principal), label.getProject().getId()))
             throw new NoAccessPermissionException();
 
@@ -43,15 +43,10 @@ public class LabelController {
     @RequestMapping(value = "", method = RequestMethod.POST)
     public void addLabel(@RequestBody LabelDto labelDto,
                          Principal principal) throws Exception {
-        // check projectId field
         if (labelDto.getProjectId() == null) {
-            throw new Exception(); // TODO: missing field
+            throw new DataMissingException("No Project ID specified !");
         }
-
-        // check project
         Project project = projectService.findByKey(labelDto.getProjectId());
-
-        // check permission
         if (!authorizationService.userCanAccessProject(Utils.getUsernameFromPrincipal(principal), project.getId()))
             throw new NoAccessPermissionException();
 

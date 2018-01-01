@@ -3,6 +3,7 @@ package com.tinnguyen263.mykanban.controller;
 import com.tinnguyen263.mykanban.controller.dtos.CardDto;
 import com.tinnguyen263.mykanban.controller.dtos.CardWithLabelIdsDto;
 import com.tinnguyen263.mykanban.controller.dtos.CardWithLabelsDto;
+import com.tinnguyen263.mykanban.exceptions.DataConfictException;
 import com.tinnguyen263.mykanban.exceptions.NoAccessPermissionException;
 import com.tinnguyen263.mykanban.model.Card;
 import com.tinnguyen263.mykanban.model.Label;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/cards")
@@ -30,31 +31,38 @@ public class CardController {
     @Autowired
     private AuthorizationService authorizationService;
     @Autowired
-    private MColumnService mColumnService;
+    private MColumnService columnService;
 
     // add
     @RequestMapping(value = "", method = RequestMethod.POST)
     public CardDto addCard(@RequestBody CardWithLabelIdsDto cardDto,
                            Principal principal) throws Exception {
         String username = Utils.getUsernameFromPrincipal(principal);
-        MColumn column = mColumnService.findByKey(cardDto.getColumnId());
+        MColumn column = columnService.findByKey(cardDto.getColumnId());
         Project project = column.getProject();
         if (!authorizationService.userCanAccessProject(username, project.getId()))
             throw new NoAccessPermissionException();
 
-        Card card = Converter.toEntity(cardDto, mColumnService);
+        Card card = Converter.toEntity(cardDto, columnService);
 
-        // TODO: adjust display order
-
-        // int[] labelIds => Card.Labels
+        // label ids => Card.Labels
         ArrayList<Label> labels = new ArrayList<>();
         for (int labelId : cardDto.getLabelIds()) {
             Label label = labelService.findByKey(labelId);
             if (!label.getProject().getId().equals(project.getId()))
-                throw new Exception();  // label of another project
+                throw new DataConfictException("Can not add label from another project !");
             labels.add(label);
         }
         card.setLabels(labels);
+
+        // adjust other cards
+        List<Card> cards = new ArrayList<>(column.getCards());
+        for (Card c : cards) {
+            if (c.getDisplayOrder() >= card.getDisplayOrder())
+                c.setDisplayOrder(c.getDisplayOrder() + 1);
+            cardService.saveOrUpdate(c);
+        }
+
         card = cardService.saveOrUpdate(card);
 
         return new CardWithLabelsDto(card);
@@ -82,38 +90,64 @@ public class CardController {
         String username = Utils.getUsernameFromPrincipal(principal);
         Card card = cardService.findByKey(cardId);
         MColumn column = card.getColumn();
-
         if (!authorizationService.userCanAccessProject(username, column.getProject().getId()))
             throw new NoAccessPermissionException();
 
+        // move card to another column
+        if (cardDto.getColumnId() != null && !column.getId().equals(cardDto.getColumnId())) {
+            MColumn desColumn = columnService.findByKey(cardDto.getColumnId());
+
+            // update old column's cards
+            List<Card> cards = new ArrayList<>(column.getCards());
+            for (Card c : cards) {
+                if (c.getDisplayOrder() > card.getDisplayOrder()) {
+                    c.setDisplayOrder(c.getDisplayOrder() - 1);
+                    cardService.saveOrUpdate(c);
+                }
+            }
+
+            card.setColumn(desColumn);
+            card.setDisplayOrder(desColumn.getCards().size());
+
+            column = desColumn;
+        }
+
+        // update other info
         card.setName(cardDto.getName());
         card.setContent(cardDto.getContent());
         card.setDueTime(cardDto.getDueTime());
 
-        card.setDisplayOrder(cardDto.getDisplayOrder());
-        // TODO: adjust display order
+        System.out.println(cardDto.getDueTime());
+        System.out.println(card.getDueTime());
 
-        cardService.saveOrUpdate(card);
+        int src = card.getDisplayOrder();
+        int des = cardDto.getDisplayOrder();
 
-        // move card to another column
-        if (!Objects.equals(column.getId(), cardDto.getColumnId())) {
-            MColumn desColumn = mColumnService.findByKey(cardDto.getColumnId());
-            if (desColumn == null)
-                throw new Exception();    // TODO: ERROR: adding card to undefined column
-            else {
-                // move card to desColumn
-                card.setColumn(desColumn);
-                cardService.saveOrUpdate(card);
+        if (des != src) {
+            List<Card> cards = new ArrayList<>(column.getCards());
+            if (des < 0) {
+                des = 0;
+            } else if (des > cards.size() - 1) {
+                des = cards.size() - 1;
+            }
 
-                // re-arrange cards in desColumn
-                ArrayList<Card> cards = new ArrayList<>(desColumn.getCards());
-                for (int i = 0; i < cards.size(); i++) {
-                    cards.get(i).setDisplayOrder(i);
-                    // save
-                    cardService.saveOrUpdate(cards.get(i));
+            // update other cards
+            for (Card c : cards) {
+                int index = c.getDisplayOrder();
+                if (index < src && index >= des) { // move card back, move others forward
+                    c.setDisplayOrder(index + 1);
+                    cardService.saveOrUpdate(c);
+                }
+                if (index > src && index <= des) { // // move card forwaard, move others back
+                    c.setDisplayOrder(index - 1);
+                    cardService.saveOrUpdate(c);
                 }
             }
         }
+
+        card.setDisplayOrder(des);
+        cardService.saveOrUpdate(card);
+
 
         return new CardDto(cardService.saveOrUpdate(card));
     }
@@ -125,9 +159,17 @@ public class CardController {
         String username = Utils.getUsernameFromPrincipal(principal);
         Card card = cardService.findByKey(cardId);
         Project project = card.getColumn().getProject();
-
         if (!authorizationService.userCanAccessProject(username, project.getId()))
             throw new NoAccessPermissionException();
+
+        // update order
+        List<Card> cards = new ArrayList<>(card.getColumn().getCards());
+        for (Card c : cards) {
+            if (c.getDisplayOrder() > card.getDisplayOrder()) {
+                c.setDisplayOrder(c.getDisplayOrder() - 1);
+                cardService.saveOrUpdate(c);
+            }
+        }
 
         cardService.deleteByKey(cardId);
     }

@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS `kanban`.`project` (
 --   `operation`  VARCHAR(64) NOT NULL,
 --   `obj_type`   VARCHAR(64) NOT NULL,
 --   `obj_id`     INT(11)     NOT NULL,
---   `time`       TIME        NOT NULL,
+--   `time`       DATETIME        NOT NULL,
 --   PRIMARY KEY (`project_id`, `user_id`),
 --   INDEX `activity_user` (`user_id` ASC),
 --   CONSTRAINT `activity_project`
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS `kanban`.`card` (
   `id`            INT(11)      NOT NULL AUTO_INCREMENT,
   `name`          VARCHAR(128) NOT NULL,
   `content`       MEDIUMTEXT   NULL     DEFAULT NULL,
-  `due_time`      TIME         NULL     DEFAULT NULL,
+  `due_time`      DATETIME     NULL     DEFAULT NULL,
   `display_order` INT(11)      NOT NULL,
   `mcolumn_id`    INT(11)      NOT NULL,
   PRIMARY KEY (`id`),
@@ -112,7 +112,7 @@ CREATE TABLE IF NOT EXISTS `kanban`.`card` (
 --   `user_id`   INT(11)      NOT NULL,
 --   `file_name` VARCHAR(128) NOT NULL,
 --   `path`      VARCHAR(128) NOT NULL,
---   `time`      TIME         NOT NULL,
+--   `time`      DATETIME         NOT NULL,
 --   PRIMARY KEY (`card_id`, `user_id`),
 --   INDEX `attachment_user` (`user_id` ASC),
 --   CONSTRAINT `attachment_card`
@@ -232,7 +232,7 @@ CREATE TABLE IF NOT EXISTS `kanban`.`clientdetails` (
 --   `card_id` INT(11)    NOT NULL,
 --   `user_id` INT(11)    NOT NULL,
 --   `content` MEDIUMTEXT NOT NULL,
---   `time`    TIME       NOT NULL,
+--   `time`    DATETIME       NOT NULL,
 --   PRIMARY KEY (`card_id`, `user_id`),
 --   INDEX `comment_user` (`user_id` ASC),
 --   CONSTRAINT `comment_card`

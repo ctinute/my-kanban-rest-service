@@ -22,3 +22,4 @@ VALUES
 # VALUES
 #   ("barClientIdPassword", "secret", "bar,read,write",
 #    "password,authorization_code,refresh_token", null, null, 36000, 36000, null, true);
+

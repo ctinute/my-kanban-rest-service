@@ -42,17 +42,17 @@ public class LabelsOfProjectController {
         return labelDtos;
     }
 
-    // add label
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    public void addLabel(@PathVariable Integer projectId,
-                         @RequestBody LabelDto labelDto,
-                         Principal principal) throws NoAccessPermissionException {
-        if (!authorizationService.userCanAccessProject(Utils.getUsernameFromPrincipal(principal), projectId))
-            throw new NoAccessPermissionException();
-
-        labelDto.setProjectId(projectId);
-        Label label = Converter.toEntity(labelDto);
-        label.setProject(projectService.findByKey(projectId));
-        labelService.saveOrUpdate(label);
-    }
+//    // add label
+//    @RequestMapping(value = "", method = RequestMethod.POST)
+//    public void addLabel(@PathVariable Integer projectId,
+//                         @RequestBody LabelDto labelDto,
+//                         Principal principal) throws NoAccessPermissionException {
+//        if (!authorizationService.userCanAccessProject(Utils.getUsernameFromPrincipal(principal), projectId))
+//            throw new NoAccessPermissionException();
+//
+//        labelDto.setProjectId(projectId);
+//        Label label = Converter.toEntity(labelDto);
+//        label.setProject(projectService.findByKey(projectId));
+//        labelService.saveOrUpdate(label);
+//    }
 }

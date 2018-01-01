@@ -3,8 +3,7 @@ package com.tinnguyen263.mykanban.controller;
 import com.tinnguyen263.mykanban.controller.dtos.ProjectDto;
 import com.tinnguyen263.mykanban.controller.dtos.TeamUserTeamDto;
 import com.tinnguyen263.mykanban.controller.dtos.UserDto;
-import com.tinnguyen263.mykanban.exceptions.EmailExistedException;
-import com.tinnguyen263.mykanban.exceptions.UsernameExistedException;
+import com.tinnguyen263.mykanban.exceptions.DataConfictException;
 import com.tinnguyen263.mykanban.model.*;
 import com.tinnguyen263.mykanban.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,16 +44,16 @@ public class UserController {
 
     // register a new user
     @RequestMapping(value = "", method = RequestMethod.POST, produces = {"application/json"})
-    public UserDto register(@RequestBody UserDto user) throws EmailExistedException, UsernameExistedException {
+    public UserDto register(@RequestBody UserDto user) throws DataConfictException {
         // checking if new username already existed
         if (user.getUsername() != null && !user.getUsername().isEmpty())
             if (userService.findByUsername(user.getUsername()) != null)
-                throw new UsernameExistedException();
+                throw new DataConfictException("Username existed !");
 
         // checking if email already existed
         if (user.getEmail() != null && !user.getEmail().isEmpty())
             if (userService.findByEmail(user.getEmail()) != null)
-                throw new EmailExistedException();
+                throw new DataConfictException("Email existed !");
 
         // save new user
         return new UserDto(userService.saveOrUpdate(toEntity(user)));
@@ -63,20 +62,20 @@ public class UserController {
     // update current user's info
     @RequestMapping(value = "", method = RequestMethod.PUT, produces = {"application/json"})
     public UserDto updateUser(@RequestBody UserDto user,
-                              Principal principal) throws UsernameExistedException, EmailExistedException {
+                              Principal principal) throws DataConfictException {
         User currentUser = Utils.getCurrentUserFromPrincipal(principal, userService);
 
         // checking if new username already existed
         if (user.getUsername() != null && !user.getUsername().isEmpty() && !user.getUsername().equals(currentUser.getUsername()))
             if (userService.findByUsername(user.getUsername()) != null)
-                throw new UsernameExistedException();
+                throw new DataConfictException("Username existed !");
             else
                 currentUser.setUsername(user.getUsername());
 
         // checking if email already existed
         if (user.getEmail() != null && !user.getEmail().isEmpty() && !user.getEmail().equals(currentUser.getEmail()))
             if (userService.findByEmail(user.getEmail()) != null)
-                throw new EmailExistedException();
+                throw new DataConfictException("Email existed !");
             else
                 currentUser.setEmail(user.getEmail());
 

@@ -43,25 +43,25 @@ public class ColumnsOfProjectController {
         return mColumnDtos;
     }
 
-    // add column to project
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    public MColumnDto addColumn(@PathVariable int projectId,
-                                @RequestBody MColumnDto mColumnDto,
-                                Principal principal) throws NoAccessPermissionException {
-        String username = Utils.getUsernameFromPrincipal(principal);
-
-        Project project = projectService.findByKey(mColumnDto.getProjectId());
-        if (project == null)
-            throw new EntityNotFoundException();    // TODO: ERROR: adding column to undefined project
-
-        if (!authorizationService.userCanAccessProject(username, project.getId()))
-            throw new NoAccessPermissionException();
-
-        mColumnDto.setProjectId(projectId); // override request body projectId
-        MColumn column = Converter.toEntity(mColumnDto);
-        column.setProject(project);
-        column = mColumnService.saveOrUpdate(column);
-
-        return new MColumnDto(column);
-    }
+//    // add column to project
+//    @RequestMapping(value = "", method = RequestMethod.POST)
+//    public MColumnDto addColumn(@PathVariable int projectId,
+//                                @RequestBody MColumnDto mColumnDto,
+//                                Principal principal) throws NoAccessPermissionException {
+//        String username = Utils.getUsernameFromPrincipal(principal);
+//
+//        Project project = projectService.findByKey(mColumnDto.getProjectId());
+//        if (project == null)
+//            throw new EntityNotFoundException();    // TODO: ERROR: adding column to undefined project
+//
+//        if (!authorizationService.userCanAccessProject(username, project.getId()))
+//            throw new NoAccessPermissionException();
+//
+//        mColumnDto.setProjectId(projectId); // override request body projectId
+//        MColumn column = Converter.toEntity(mColumnDto);
+//        column.setProject(project);
+//        column = mColumnService.saveOrUpdate(column);
+//
+//        return new MColumnDto(column);
+//    }
 }

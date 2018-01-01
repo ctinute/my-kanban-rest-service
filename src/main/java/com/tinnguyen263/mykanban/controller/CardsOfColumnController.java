@@ -17,8 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/columns/{columnId}/cards")
@@ -44,7 +43,13 @@ public class CardsOfColumnController {
         if (!project.getPublic() && !authorizationService.userCanAccessProject(username, project.getId()))
             throw new NoAccessPermissionException();
 
-        Collection<Card> cards = column.getCards();
+        List<Card> cards = new ArrayList<>(column.getCards());
+        cards.sort((o1, o2) -> {
+            if (o1.getDisplayOrder() == o2.getDisplayOrder())
+                return 0;
+            return o1.getDisplayOrder() < o2.getDisplayOrder() ? -1 : 1;
+        });
+
         Collection<CardWithLabelsDto> cardDtos = new ArrayList<>();
         for (Card card : cards) {
             Collection<Label> labels = card.getLabels();
@@ -59,32 +64,33 @@ public class CardsOfColumnController {
     }
 
     // add
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    public CardDto addCard(@PathVariable int columnId,
-                           @RequestBody CardWithLabelIdsDto cardDto,
-                           Principal principal) throws Exception {
-        String username = Utils.getUsernameFromPrincipal(principal);
-        cardDto.setColumnId(columnId);  // override
-        MColumn column = mColumnService.findByKey(cardDto.getColumnId());
-        Project project = column.getProject();
-        if (!authorizationService.userCanAccessProject(username, project.getId()))
-            throw new NoAccessPermissionException();
-
-        Card card = Converter.toEntity(cardDto, mColumnService);
-
-        // TODO: adjust display order
-
-        // int[] labelIds => Card.Labels
-        ArrayList<Label> labels = new ArrayList<>();
-        for (int labelId : cardDto.getLabelIds()) {
-            Label label = labelService.findByKey(labelId);
-            if (!label.getProject().getId().equals(project.getId()))
-                throw new Exception();  // label of another project
-            labels.add(label);
-        }
-        card.setLabels(labels);
-        card = cardService.saveOrUpdate(card);
-
-        return new CardWithLabelsDto(card);
-    }
+//    @RequestMapping(value = "", method = RequestMethod.POST)
+//    public CardDto addCard(@PathVariable int columnId,
+//                           @RequestBody CardWithLabelIdsDto cardDto,
+//                           Principal principal) throws Exception {
+//        String username = Utils.getUsernameFromPrincipal(principal);
+//        cardDto.setColumnId(columnId);  // override
+//        MColumn column = mColumnService.findByKey(cardDto.getColumnId());
+//        Project project = column.getProject();
+//        if (!authorizationService.userCanAccessProject(username, project.getId()))
+//            throw new NoAccessPermissionException();
+//
+//        Card card = Converter.toEntity(cardDto, mColumnService);
+//
+//        // adjust display order
+//
+//
+//        // int[] labelIds => Card.Labels
+//        ArrayList<Label> labels = new ArrayList<>();
+//        for (int labelId : cardDto.getLabelIds()) {
+//            Label label = labelService.findByKey(labelId);
+//            if (!label.getProject().getId().equals(project.getId()))
+//                throw new Exception();  // label of another project
+//            labels.add(label);
+//        }
+//        card.setLabels(labels);
+//        card = cardService.saveOrUpdate(card);
+//
+//        return new CardWithLabelsDto(card);
+//    }
 }

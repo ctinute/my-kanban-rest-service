@@ -10,21 +10,21 @@ import com.tinnguyen263.mykanban.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityNotFoundException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/columns")
 public class ColumnController {
 
-    private final MColumnService mColumnService;
+    private final MColumnService columnService;
     private final ProjectService projectService;
     private final AuthorizationService authorizationService;
 
     @Autowired
-    public ColumnController(MColumnService mColumnService, ProjectService projectService, AuthorizationService authorizationService) {
-        this.mColumnService = mColumnService;
+    public ColumnController(MColumnService columnService, ProjectService projectService, AuthorizationService authorizationService) {
+        this.columnService = columnService;
         this.projectService = projectService;
         this.authorizationService = authorizationService;
     }
@@ -34,9 +34,8 @@ public class ColumnController {
     public MColumnDto getColumn(@PathVariable Integer columnId,
                                 Principal principal) throws NoAccessPermissionException {
         String username = Utils.getUsernameFromPrincipal(principal);
-        MColumn column = mColumnService.findByKey(columnId);
+        MColumn column = columnService.findByKey(columnId);
         Project project = column.getProject();
-
         if (!project.getPublic() && !authorizationService.userCanAccessProject(username, project.getId()))
             throw new NoAccessPermissionException();
 
@@ -48,60 +47,68 @@ public class ColumnController {
     public MColumnDto addColumn(@RequestBody MColumnDto mColumnDto,
                                 Principal principal) throws Exception {
         String username = Utils.getUsernameFromPrincipal(principal);
-
-        // check projectId field
-        if (mColumnDto.getProjectId() == null) {
-            throw new Exception();  // TODO: no project specified
-        }
-
-        // check project
         Project project = projectService.findByKey(mColumnDto.getProjectId());
-        if (project == null)
-            throw new EntityNotFoundException();    // TODO: adding column to undefined project
-
-        // check permission on project
         if (!authorizationService.userCanAccessProject(username, project.getId()))
             throw new NoAccessPermissionException();
 
         MColumn column = Converter.toEntity(mColumnDto);
         column.setProject(project);
-        column = mColumnService.saveOrUpdate(column);
 
-        return new MColumnDto(column);
+        // adjust other columns
+        List<MColumn> columns = new ArrayList<>(project.getmColumns());
+        for (MColumn c : columns) {
+            if (c.getDisplayOrder() >= column.getDisplayOrder())
+                c.setDisplayOrder(c.getDisplayOrder() + 1);
+            columnService.saveOrUpdate(c);
+        }
+
+        return new MColumnDto(columnService.saveOrUpdate(column));
     }
 
     // edit MColumn
     @RequestMapping(value = "/{columnId}", method = RequestMethod.PUT)
-    public void editMColumn(@PathVariable Integer columnId,
-                            @RequestBody MColumnDto mColumnDto,
-                            Principal principal) throws NoAccessPermissionException {
+    public MColumnDto editMColumn(@PathVariable Integer columnId,
+                                  @RequestBody MColumnDto columnDto,
+                                  Principal principal) throws NoAccessPermissionException {
         String username = Utils.getUsernameFromPrincipal(principal);
-        MColumn column = mColumnService.findByKey(columnId);
+        MColumn column = columnService.findByKey(columnId);
         Project project = column.getProject();
-
         if (!authorizationService.userCanAccessProject(Utils.getUsernameFromPrincipal(principal), project.getId()))
             throw new NoAccessPermissionException();
 
-        column.setName(mColumnDto.getName());
-        column.setDescription(mColumnDto.getDescription());
-        column.setCardLimit(mColumnDto.getCardLimit());
-        mColumnService.saveOrUpdate(column);
+        column.setName(columnDto.getName());
+        column.setDescription(columnDto.getDescription());
+        column.setCardLimit(columnDto.getCardLimit());
 
-        // change column order
-        if (column.getDisplayOrder() != mColumnDto.getDisplayOrder()) {
-            int src = column.getDisplayOrder();
-            int des = mColumnDto.getDisplayOrder();
+        int src = column.getDisplayOrder();
+        int des = columnDto.getDisplayOrder();
+        if (des != src) {
 
-            ArrayList<MColumn> mColumns = (ArrayList<MColumn>) mColumnService.getColumnsOfProject(project.getId());
-            mColumns.add(des, mColumns.remove(src));
+            List<MColumn> columns = new ArrayList<>(project.getmColumns());
 
-            // re-arrange columns
-            for (int i = 0; i < mColumns.size(); i++) {
-                mColumns.get(i).setDisplayOrder(i);
-                // save
-                mColumnService.saveOrUpdate(mColumns.get(i));
+            if (des < 0) {
+                des = 0;
+            } else if (des > columns.size() - 1) {
+                des = columns.size();
             }
+
+            // update other columns
+            for (MColumn c : columns) {
+                int index = c.getDisplayOrder();
+                if (index < src && index >= des) { // move back, move others forward
+                    c.setDisplayOrder(index + 1);
+                    columnService.saveOrUpdate(c);
+                }
+                if (index > src && index <= des) { // // move forward, move others back
+                    c.setDisplayOrder(index - 1);
+                    columnService.saveOrUpdate(c);
+                }
+            }
+
+            column.setDisplayOrder(columnDto.getDisplayOrder());
         }
+
+        return new MColumnDto(columnService.saveOrUpdate(column));
     }
 
     // delete MColumn
@@ -109,13 +116,21 @@ public class ColumnController {
     public void deleteMColumn(@PathVariable Integer columnId,
                               Principal principal) throws NoAccessPermissionException {
         String username = Utils.getUsernameFromPrincipal(principal);
-        MColumn column = mColumnService.findByKey(columnId);
+        MColumn column = columnService.findByKey(columnId);
         Project project = column.getProject();
-
         if (!authorizationService.userCanAccessProject(Utils.getUsernameFromPrincipal(principal), project.getId()))
             throw new NoAccessPermissionException();
 
-        mColumnService.deleteByKey(columnId);
+        // adjust other columns display order
+        List<MColumn> columnList = new ArrayList<>(project.getmColumns());
+        for (MColumn col : columnList) {
+            if (col.getDisplayOrder() > column.getDisplayOrder()) {
+                col.setDisplayOrder(col.getDisplayOrder() - 1);
+                columnService.saveOrUpdate(col);
+            }
+        }
+
+        columnService.deleteByKey(columnId);
     }
 
 
