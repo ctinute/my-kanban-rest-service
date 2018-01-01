@@ -52,7 +52,7 @@ public class ColumnsOfProjectController {
 //
 //        Project project = projectService.findByKey(mColumnDto.getProjectId());
 //        if (project == null)
-//            throw new EntityNotFoundException();    // TODO: ERROR: adding column to undefined project
+//            throw new EntityNotFoundException();
 //
 //        if (!authorizationService.userCanAccessProject(username, project.getId()))
 //            throw new NoAccessPermissionException();

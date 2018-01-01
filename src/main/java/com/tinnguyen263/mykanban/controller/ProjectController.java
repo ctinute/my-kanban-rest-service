@@ -111,7 +111,7 @@ public class ProjectController {
             throw new NoModifyPermissionException();
         }
 
-        projectService.deleteByKey(projectId);  // TODO: not working, don't know why =_=!
+        projectService.deleteByKey(projectId);  // TODO: not working, don't know why
     }
 
     // DTOs
